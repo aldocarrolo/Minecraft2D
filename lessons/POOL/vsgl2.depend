@@ -1,0 +1,56 @@
+# depslib dependency file v1.0
+1490969062 source:c:\users\aldo carrolo\desktop\vsgl2-master\vsgl2.cpp
+	<iostream>
+	<map>
+	"version.h"
+	"vsgl2.h"
+
+1490969062 c:\users\aldo carrolo\desktop\vsgl2-master\version.h
+
+1490969062 c:\users\aldo carrolo\desktop\vsgl2-master\vsgl2.h
+	<string>
+	<sstream>
+	<SDL2/SDL.h>
+	<SDL2/SDL_net.h>
+	<SDL2/SDL_image.h>
+	<SDL2/SDL_mixer.h>
+	<SDL2/SDL_ttf.h>
+	"vsgl2_keycode.h"
+
+1492277073 c:\users\aldo carrolo\desktop\vsgl2-master\vsgl2_keycode.h
+
+1492617784 source:c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\main.cpp
+	<iostream>
+	<time.h>
+	<math.h>
+	"../../vsgl2.h"
+	<fstream>
+	<stdlib.h>
+	"global_variable.h"
+	"lib/library_map.h"
+	"lib/library_player.h"
+
+1492261426 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\map
+
+1492334226 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\generation_map\generation_map.h
+	"generation_map.cpp"
+
+1492355942 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\generation_map\generation_map.cpp
+
+1492369926 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\lib\generation_map.h
+	"generation_map.cpp"
+
+1492369980 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\lib\generation_map.cpp
+
+1492614447 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\lib\library_map.h
+	"library_map.cpp"
+
+1492614443 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\lib\library_map.cpp
+
+1492613173 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\lib\library_player.h
+	"library_player.cpp"
+
+1492614451 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\lib\library_player.cpp
+
+1492613485 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\global_variable.h
+

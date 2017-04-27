@@ -22,22 +22,6 @@ struct Coeff_Movimento
     float y = 0;
 } coeff_movimento;
 
-/*string texture[100] =
-{
-    "",
-    "image/grass.png",	// erba
-    "image/dirt.png",	// terra
-    "image/stone.png",	// pietra
-    "image/leave.png",  // foglia
-    "image/oak_plank.png",  // legno di quercia
-};
-
-int time_block[100] =
-{
-    0, 1000, 1000, 3000, 250, 1900,
-    //0,0,0,0,0,0,
-};*/
-
 struct p
 {
     float width = 30, height = 75;

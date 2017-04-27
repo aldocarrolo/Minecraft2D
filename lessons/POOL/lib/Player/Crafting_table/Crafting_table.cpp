@@ -126,8 +126,6 @@ void controllo_crafting_table()
 
     file += ".save";
 
-    cout << file << endl;
-
     ifstream in(file);
 
     if(in != NULL)
