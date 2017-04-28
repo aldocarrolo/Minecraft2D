@@ -1,10 +1,7 @@
-struct Blocchi_Inventario
+// BLOCCHI CHE INDICANO LE VARIE POSIZIONI DELL'INVENTARIO
+Blocchi_Inventario blocchi_inventario[HEIGHT_INVENTORY + 3][WIDTH_INVENTORY] =
 {
-    int x, y;
-};
-
-Blocchi_Inventario blocchi_inventario[HEIGHT_INVENTORY][WIDTH_INVENTORY] =
-{
+    // BLOCCHI INVENTARIO
     {
         {WIDTH_WINDOW/2 - 176 + 16,HEIGHT_WINDOW/2 - 166 + 168},
         {WIDTH_WINDOW/2 - 176 + 52,HEIGHT_WINDOW/2 - 166 + 168},
@@ -54,21 +51,42 @@ Blocchi_Inventario blocchi_inventario[HEIGHT_INVENTORY][WIDTH_INVENTORY] =
     },
 };
 
+// VETTORE CHE INDICA I VARI LBOCCHI DEL CRAFTING
+// IL CRAFTING DELL'INVENTARIO E' UN 2X2
 Blocchi_Inventario crafting_inventario[2][2] =
 {
     {{WIDTH_WINDOW/2 - 176 + 98*2, HEIGHT_WINDOW/2 - 166 + 18*2}, {WIDTH_WINDOW/2 - 176 + 116*2, HEIGHT_WINDOW/2 - 166 + 18*2}},
     {{WIDTH_WINDOW/2 - 176 + 98*2, HEIGHT_WINDOW/2 - 166 + 36*2}, {WIDTH_WINDOW/2 - 176 + 116*2, HEIGHT_WINDOW/2 - 166 + 36*2}}
 };
 
+// BLOCCO CONTENENTE LA POSIZIONE DEL RISULTATO DEL CRAFTING NELL'INVENTARIO
 Blocchi_Inventario risultato_crafting = {WIDTH_WINDOW/2 - 176 + 154*2, HEIGHT_WINDOW/2 - 166 + 28*2};
 
+// FUNZIONE CHE PERMETTE IL DISEGNO DELL'INVENTARIO
 void disegna_inventario()
 {
-    draw_filled_rect(0,0,WIDTH_WINDOW, HEIGHT_WINDOW, Color(0,0,0,125));
+    draw_filled_rect(0,0,WIDTH_WINDOW, HEIGHT_WINDOW, Color(0,0,0,125));    // RETTANGOLO NERO CON TRASPARENZA A 125
 
-    draw_image("image/inventory.png", WIDTH_WINDOW/2 - 176, HEIGHT_WINDOW/2 - 166, 176*2, 166*2, 255);
+    draw_image("image/inventory.png", WIDTH_WINDOW/2 - 176, HEIGHT_WINDOW/2 - 166, 176*2, 166*2, 255);  // DISEGNO DELL'IMMAGINE
 }
 
+// FUNZIONE CHE DISEGNA UN BLOCCO ALLINTERNO DELL'INVENTARIO
+void disegna_blocco_inventario(int posizione, int quantita, Blocchi_Inventario coordinate, int width, int height)
+{
+    // DISEGNO IL BLOCCO
+    draw_image(blocchi[posizione].texture, coordinate.x + 6, coordinate.y + 6, width,height, 255);
+    // E UNO QUADRATO "SEMI" TRASPARENTE
+    draw_filled_rect(coordinate.x + 5, coordinate.y + 5, width, height, Color(0,0,0,50));
+    // DISEGNO IL SUO CONTORNO
+    draw_rect(coordinate.x + 5, coordinate.y + 5, width + 2,height + 2, Color(0,0,0,255));
+
+    // E INFINE IL NUMERO DI QUANTITA' DEL BLOCCO
+    string numero = int_to_string(quantita);
+    disegna_testo("font/Minecraftia-Regular.ttf", 13, numero,  coordinate.x + 16, coordinate.y + 16, Color(255,255,255,255));
+}
+
+// FUNZIONE CHE PERMETTE DI RILEVARE UNA SOLA VOLTA LA PRESSIONE DI UN TASTO
+// QUESTA FUNZIONE SERVIRA' PER VEDERE SE IL GIOCATORE PREME LA E PER APRIRE L'INVENTARIO
 static int flag_controllo_tasto = 0;
 bool bottone_premuto()
 {
@@ -86,38 +104,45 @@ bool bottone_premuto()
     return valore_ritorno;
 }
 
-void tasto_sinistro_inventario(int i, int j)
+// FUNZIONE PER IL "TRASPORTO" O "INSERIMENTO" DI UN BLOCCO ALL'INTERNO DI UN POSTO
+// NELL'INVENTARIO
+void tasto_sinistro_inventario(int *posizione, int *quantita)
 {
     static int tasto_sinistro_inventaro = 0;
 
-    if(mouse_left_button_pressed() && tasto_sinistro_inventaro != 1)
+    if(mouse_left_button_pressed() && tasto_sinistro_inventaro != 1) // SE PREMO TASTO SINISTRO
     {
         tasto_sinistro_inventaro  = 1;
 
+        // SE IL CURSORE E' VUOTO ALLORA INSERISCO IL BLOCCO NEL CURSORE
         if(cursore.type == 0)
         {
-            cursore.type = player.inventario[i][j];
-            cursore.quantita = player.inventario_quantita[i][j];
-            player.inventario[i][j] = 0;
-            player.inventario_quantita[i][j] = 0;
+            cursore.type = *posizione;
+            cursore.quantita = *quantita;
+            *posizione = 0;
+            *quantita = 0;
         }
         else
         {
-            if(player.inventario[i][j] == 0)
+            // SE IL CURSORE E' VUOTO E IL BLOCCO NELL'INVENTARIO E' VUOTO
+            // ALLORA INSERISCO IL BLOCCO DAL CURSORE AL POSTO
+            if(*posizione == 0)
             {
-                player.inventario[i][j] = cursore.type;
-                player.inventario_quantita[i][j] = cursore.quantita;
+                *posizione = cursore.type;
+                *quantita = cursore.quantita;
                 cursore.type = 0;
                 cursore.quantita = 0;
             }
-            else if(player.inventario[i][j] == cursore.type)
+            // ALTRIMENTI SE IL BLOCCO NEL CURSORE E' UGUALE AL BLOCCO NEL POSTO DELL'INVENTARIO
+            // ALLORA LO AGGIUNGO AI BLOCCHI DELL'INVENTARIO
+            else if(*posizione == cursore.type)
             {
-                player.inventario_quantita[i][j] += cursore.quantita;
+                *quantita += cursore.quantita;
 
-                if(player.inventario_quantita[i][j] > 64)
+                if(*quantita > 64)
                 {
-                    cursore.quantita = player.inventario_quantita[i][j] - 64;
-                    player.inventario_quantita[i][j] = 64;
+                    cursore.quantita = *quantita - 64;
+                    *quantita = 64;
                 }
                 else
                 {
@@ -125,21 +150,21 @@ void tasto_sinistro_inventario(int i, int j)
                     cursore.quantita = 0;
                 }
             }
+            // ALTRIMENTI SCAMBIO IL BLOCCO DEL CURSORE CON QUELLO DELL'INVENTARIO
             else
             {
-                swap(player.inventario[i][j], cursore.type);
-                swap(player.inventario_quantita[i][j], cursore.quantita);
+                swap(*posizione, cursore.type);
+                swap(*quantita, cursore.quantita);
             }
         }
     }
 
     if(!mouse_left_button_pressed() && tasto_sinistro_inventaro  == 1)
-    {
         tasto_sinistro_inventaro = 0;
-    }
 }
 
-void tasto_destro_inventario(int i, int j)
+// FUNZIONE CHE PERMETTE DI PREMERE IL TASTO DESTRO PER FAR ESEGUIRE UNO SPECIFICO EVENTO
+void tasto_destro_inventario(int *posizione, int *quantita)
 {
     static int tasto_destro_inventaro = 0;
 
@@ -147,129 +172,46 @@ void tasto_destro_inventario(int i, int j)
     {
         tasto_destro_inventaro  = 1;
 
-        if(player.inventario[i][j] == 0 && cursore.type != 0)
+        // SE IL CURSORE NON E' VUOTOT
+        if(cursore.type != 0)
         {
-            cursore.quantita--;
-            player.inventario[i][j] = cursore.type;
-            player.inventario_quantita[i][j]++;
+            // E LA POSIZIONE NELL'INVENTARIO E' VUOTA
+            // ALLORA INSERISCO UN SOLO BLOCCO
+            if(*posizione == 0)
+            {
+                cursore.quantita--;
+                *posizione = cursore.type;
+                *quantita = *quantita + 1;
 
-            if(cursore.quantita == 0)
-                cursore.type = 0;
-        }
-        else if(player.inventario[i][j] == cursore.type && cursore.type != 0 && player.inventario_quantita[i][j] < 64)
-        {
-            cursore.quantita--;
-            player.inventario_quantita[i][j]++;
+                if(cursore.quantita == 0)
+                    cursore.type = 0;
+            }
+            // ALTRIMENTI SE LA QUANTITA E' COMPRESA TRA 0 E 64 ALLORA INSERISCO UN BLOCCO
+            else if(*posizione == cursore.type && *quantita < 64 && *quantita > 0)
+            {
+                cursore.quantita--;
+                *quantita = *quantita + 1;
 
-            if(cursore.quantita == 0)
-                cursore.type = 0;
-        }
-        else if(player.inventario[i][j] != 0 && cursore.type != 0)
-        {
-            swap(player.inventario[i][j], cursore.type);
-            swap(player.inventario_quantita[i][j], cursore.quantita);
+                if(cursore.quantita == 0)
+                    cursore.type = 0;
+            }
+            // ALTRIMENTI SE I TIPI DI BLOCCHI SONO DIVERSI SCAMBIO I BLOCCHI
+            else if(*posizione != 0)
+            {
+                swap(*posizione, cursore.type);
+                swap(*quantita, cursore.quantita);
+            }
         }
     }
 
     if(!mouse_right_button_pressed() && tasto_destro_inventaro  == 1)
-    {
         tasto_destro_inventaro = 0;
-    }
 }
 
-void tasto_sinistro_crafting(int i, int j)
-{
-    static int tasto_sinistro_crafting = 0;
-
-    if(mouse_left_button_pressed() && tasto_sinistro_crafting != 1)
-    {
-        tasto_sinistro_crafting  = 1;
-
-        if(cursore.type == 0)
-        {
-            cursore.type = player.crafting[i][j];
-            cursore.quantita = player.crafting_quantita[i][j];
-            player.crafting[i][j] = 0;
-            player.crafting_quantita[i][j] = 0;
-        }
-        else
-        {
-            if(player.crafting[i][j] == 0)
-            {
-                player.crafting[i][j] = cursore.type;
-                player.crafting_quantita[i][j] = cursore.quantita;
-                cursore.type = 0;
-                cursore.quantita = 0;
-            }
-            else if(player.crafting[i][j] == cursore.type)
-            {
-                player.crafting_quantita[i][j] += cursore.quantita;
-
-                if(player.crafting_quantita[i][j] > 64)
-                {
-                    cursore.quantita = player.crafting_quantita[i][j] - 64;
-                    player.crafting_quantita[i][j] = 64;
-                }
-                else
-                {
-                    cursore.type = 0;
-                    cursore.quantita = 0;
-                }
-            }
-            else
-            {
-                swap(player.crafting[i][j], cursore.type);
-                swap(player.crafting_quantita[i][j], cursore.quantita);
-            }
-        }
-    }
-
-    if(!mouse_left_button_pressed() && tasto_sinistro_crafting  == 1)
-    {
-        tasto_sinistro_crafting = 0;
-    }
-}
-
-void tasto_destro_crafting(int i, int j)
-{
-    static int tasto_destro_crafting = 0;
-
-    if(mouse_right_button_pressed() && tasto_destro_crafting != 1)
-    {
-        tasto_destro_crafting  = 1;
-
-        if(player.crafting[i][j] == 0 && cursore.type != 0)
-        {
-            cursore.quantita--;
-            player.crafting[i][j] = cursore.type;
-            player.crafting_quantita[i][j]++;
-
-            if(cursore.quantita == 0)
-                cursore.type = 0;
-        }
-        else if(player.crafting[i][j] == cursore.type && cursore.type != 0 && player.crafting_quantita[i][j] < 64)
-        {
-            cursore.quantita--;
-            player.crafting_quantita[i][j]++;
-
-            if(cursore.quantita == 0)
-                cursore.type = 0;
-        }
-        else if(player.crafting[i][j] != 0 && cursore.type != 0)
-        {
-            swap(player.crafting[i][j], cursore.type);
-            swap(player.crafting_quantita[i][j], cursore.quantita);
-        }
-    }
-
-    if(!mouse_right_button_pressed() && tasto_destro_crafting  == 1)
-    {
-        tasto_destro_crafting = 0;
-    }
-}
-
+// FUNZIONE CHE SERVE PER CONTROLLARE SE ESISTE UN CRAFTING
 void controllo_crafting()
 {
+    // MI CREO LA STRINGA CHE SARA' IL NOME DEL FILE
     string file = "crafting/";
     for(int i = 0; i < 2; i++)
         for(int j = 0; j < 2; j++)
@@ -277,8 +219,11 @@ void controllo_crafting()
 
     file += ".save";
 
+    // ACCEDO AL FILE
     ifstream in(file);
 
+    // SE IL FILE ESISTE ALLORA PRELEVO IL TIPO DI BLOCCO CHE MI VIENE RESTITUITO
+    // E LA SUA QUANTIA'
     if(in != NULL)
     {
         int valore, quantita;
@@ -287,13 +232,7 @@ void controllo_crafting()
         player.oggetto_risultato_crafting = valore;
         player.quantita_risultato_crafting = quantita;
 
-        draw_image(blocchi[player.oggetto_risultato_crafting].texture, risultato_crafting.x + 6, risultato_crafting.y + 6, 20,20, 255);
-        draw_filled_rect(risultato_crafting.x + 5, risultato_crafting.y + 5, 22, 22, Color(0,0,0,50));
-
-        draw_rect(risultato_crafting.x + 5, risultato_crafting.y + 5, 22,22, Color(0,0,0,255));
-
-        string quantita_crafting = int_to_string(player.quantita_risultato_crafting);
-        disegna_testo("font/Minecraftia-Regular.ttf", 13, quantita_crafting,  risultato_crafting.x + 16, risultato_crafting.y + 16, Color(255,255,255,255));
+        disegna_blocco_inventario(player.oggetto_risultato_crafting, player.quantita_risultato_crafting, risultato_crafting, 20, 20);
     }
     else
         player.oggetto_risultato_crafting = 0;
@@ -310,8 +249,8 @@ bool gestione_inventario()
         SDL_ShowCursor(SDL_ENABLE);
         disegna_inventario();
 
-        cursore.x = -1;
-        cursore.y = -1;
+        cursore.x = 0;
+        cursore.y = 0;
 
         for(int i = 0; i < HEIGHT_INVENTORY; i++)
         {
@@ -325,8 +264,8 @@ bool gestione_inventario()
 
                     esci = true;
 
-                    tasto_sinistro_inventario(i, j);
-                    tasto_destro_inventario(i, j);
+                    tasto_sinistro_inventario(&player.inventario[i][j], &player.inventario_quantita[i][j]);
+                    tasto_destro_inventario(&player.inventario[i][j], &player.inventario_quantita[i][j]);
 
                     draw_filled_rect(blocchi_inventario[i][j].x, blocchi_inventario[i][j].y, 32, 32, Color(255,255,255,125));
 
@@ -350,8 +289,8 @@ bool gestione_inventario()
 
                     esci = true;
 
-                    tasto_sinistro_crafting(i, j);
-                    tasto_destro_crafting(i, j);
+                    tasto_sinistro_inventario(&player.crafting[i][j], &player.crafting_quantita[i][j]);
+                    tasto_destro_inventario(&player.crafting[i][j], &player.crafting_quantita[i][j]);
 
                     draw_filled_rect(crafting_inventario[i][j].x, crafting_inventario[i][j].y, 32, 32, Color(255,255,255,125));
 
@@ -363,42 +302,18 @@ bool gestione_inventario()
                 break;
         }
 
+        // DISEGNO DEI BLOCCHI DELL'INVENTARIO
         for(int i = 0; i < HEIGHT_INVENTORY; i++)
-        {
             for(int j = 0; j < WIDTH_INVENTORY; j++)
-            {
                 if(player.inventario[i][j] != 0)
-                {
-                    draw_image(blocchi[player.inventario[i][j]].texture, blocchi_inventario[i][j].x + 6, blocchi_inventario[i][j].y + 6, 20,20, 255);
-                    draw_filled_rect(blocchi_inventario[i][j].x + 5, blocchi_inventario[i][j].y + 5, 22, 22, Color(0,0,0,50));
+                    disegna_blocco_inventario(player.inventario[i][j], player.inventario_quantita[i][j], blocchi_inventario[i][j], 20, 20);
 
-                    draw_rect(blocchi_inventario[i][j].x + 5, blocchi_inventario[i][j].y + 5, 22,22, Color(0,0,0,255));
-
-                    string quantita = int_to_string(player.inventario_quantita[i][j]);
-                    disegna_testo("font/Minecraftia-Regular.ttf", 13, quantita,  blocchi_inventario[i][j].x + 16, blocchi_inventario[i][j].y + 16, Color(255,255,255,255));
-
-                }
-            }
-        }
-
-
+        // DISEGNO DEI BLOCCHI DELLA CRAFTING DELL'INVENTARIO
         for(int i = 0; i < 2; i++)
-        {
             for(int j = 0; j < 2; j++)
-            {
                 if(player.crafting[i][j] != 0)
-                {
-                    draw_image(blocchi[player.crafting[i][j]].texture, crafting_inventario[i][j].x + 6, crafting_inventario[i][j].y + 6, 20,20, 255);
-                    draw_filled_rect(crafting_inventario[i][j].x + 5, crafting_inventario[i][j].y + 5, 22, 22, Color(0,0,0,50));
+                    disegna_blocco_inventario(player.crafting[i][j], player.crafting_quantita[i][j], crafting_inventario[i][j],20, 20);
 
-                    draw_rect(crafting_inventario[i][j].x + 5, crafting_inventario[i][j].y + 5, 22,22, Color(0,0,0,255));
-
-                    string quantita = int_to_string(player.crafting_quantita[i][j]);
-                    disegna_testo("font/Minecraftia-Regular.ttf", 13, quantita,  crafting_inventario[i][j].x + 16, crafting_inventario[i][j].y + 16, Color(255,255,255,255));
-
-                }
-            }
-        }
 
         if(controllo_collisione(get_mouse_x(), get_mouse_y(), 0, 0, risultato_crafting.x, risultato_crafting.y, 32, 32))
         {
