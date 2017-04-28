@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "../../vsgl2.h"
+#include "vsgl2/vsgl2.h"
 
 #include "lib/global_variable.h"
 

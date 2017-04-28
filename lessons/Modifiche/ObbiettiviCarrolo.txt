@@ -1,7 +1,0 @@
-Giorno 26/04/2017 
-Modifiche al progetto
-
-Fatto! implementazione della struttura Blocco nella libreria Blocco.cpp
-Fatto! implementazione della generazione del secondo livello di mappa
-Da Fare implementazione del crafting
-Da Fare rivisita del codice e correzione del bug del blocco

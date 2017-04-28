@@ -3,22 +3,8 @@ struct Blocchi_Inventario
     int x, y;
 };
 
-struct Cursore
-{
-    int x, y;
-
-    int type = 0, quantita = 0;
-
-} cursore;
-
-int n_blocchi_inventario = 36;
-
 Blocchi_Inventario blocchi_inventario[HEIGHT_INVENTORY][WIDTH_INVENTORY] =
 {
-//    {WIDTH_WINDOW/2 - 176 + 16,HEIGHT_WINDOW/2 - 166 + 16},
-//    {WIDTH_WINDOW/2 - 176 + 16,HEIGHT_WINDOW/2 - 166 + 52},
-//    {WIDTH_WINDOW/2 - 176 + 16,HEIGHT_WINDOW/2 - 166 + 88},
-//    {WIDTH_WINDOW/2 - 176 + 16,HEIGHT_WINDOW/2 - 166 + 124},
     {
         {WIDTH_WINDOW/2 - 176 + 16,HEIGHT_WINDOW/2 - 166 + 168},
         {WIDTH_WINDOW/2 - 176 + 52,HEIGHT_WINDOW/2 - 166 + 168},

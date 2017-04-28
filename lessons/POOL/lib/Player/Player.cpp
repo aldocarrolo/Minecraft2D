@@ -172,75 +172,42 @@ void distruggere_blocco(int mappa[][MAXWIDTH], int i, int j, int livello)
     }
 }
 
-void eliminazione_blocco_secondo_livello()
+void eliminazione_blocco_secondo_livello(int mappa[][WIDTH_CHUNK*3])
 {
-    int mouse_x = get_mouse_x();
-    int mouse_y = get_mouse_y();
-
-    for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
+    if(blocchi[mappa[cursore.y_blocco][cursore.x_blocco]].distruggi == true)
     {
-        bool esci = false;
-        for(int j =  player.inizio_finestra_x; j <  player.fine_finestra_x; j++)
+        if(player.distruggere_secondo_livello == false)
         {
-            if(blocchi[mappa.secondo_livello[i][j]].distruggi == true)
-            {
-                if(mouse_x >= j*WIDTH_BLOCK + coeff_movimento.x && mouse_x <= j*WIDTH_BLOCK+WIDTH_BLOCK + coeff_movimento.x &&
-                   mouse_y >= i*HEIGHT_BLOCK + coeff_movimento.y && mouse_y <= i*HEIGHT_BLOCK+HEIGHT_BLOCK + coeff_movimento.y)
-                {
-                    esci = true;
-
-                    if(player.distruggere_secondo_livello == false)
-                    {
-                        player.timer_blocco_distrutto = ms_time();
-                        player.x_blocco_distrutto = j;
-                        player.y_blocco_distrutto = i;
-                        player.tipo_blocco_distrutto = mappa.secondo_livello[i][j];
-                        player.distruggere_secondo_livello = true;
-                    }
-                    else if(player.distruggere_secondo_livello == true && (player.x_blocco_distrutto != j || player.y_blocco_distrutto != i))
-                    {
-                        player.timer_blocco_distrutto = ms_time();
-                        player.x_blocco_distrutto = j;
-                        player.y_blocco_distrutto = i;
-                        player.tipo_blocco_distrutto = mappa.secondo_livello[i][j];
-                        player.distruggere_secondo_livello = true;
-                    }
-
-                    return;
-                }
-            }
+            player.timer_blocco_distrutto = ms_time();
+            player.x_blocco_distrutto = cursore.x_blocco;
+            player.y_blocco_distrutto = cursore.y_blocco;
+            player.tipo_blocco_distrutto = mappa[cursore.y_blocco][cursore.x_blocco];
+            player.distruggere_secondo_livello = true;
         }
-
-        if(esci == true)
-            break;
+        else if(player.distruggere_secondo_livello == true && (player.x_blocco_distrutto != cursore.x_blocco || player.y_blocco_distrutto != cursore.y_blocco))
+        {
+            player.timer_blocco_distrutto = ms_time();
+            player.x_blocco_distrutto = cursore.x_blocco;
+            player.y_blocco_distrutto = cursore.y_blocco;
+            player.tipo_blocco_distrutto = mappa[cursore.y_blocco][cursore.x_blocco];
+            player.distruggere_secondo_livello = true;
+        }
     }
 }
 
-void creazione_blocco_secondo_livello()
+void creazione_blocco_secondo_livello(int mappa[][WIDTH_CHUNK*3])
 {
-    int mouse_x = get_mouse_x();
-    int mouse_y = get_mouse_y();
-
-    for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
+    if(blocchi[mappa[cursore.y_blocco][cursore.x_blocco]].distruggi == false)
     {
-        for(int j =  player.inizio_finestra_x; j < player.fine_finestra_x; j++)
+        if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0)
         {
-            if(blocchi[mappa.secondo_livello[i][j]].distruggi == false)
-            {
-                if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0 && mouse_x >= j*WIDTH_BLOCK + coeff_movimento.x && mouse_x <= j*WIDTH_BLOCK+WIDTH_BLOCK + coeff_movimento.x &&
-                   mouse_y >= i*HEIGHT_BLOCK + coeff_movimento.y && mouse_y <= i*HEIGHT_BLOCK+HEIGHT_BLOCK + coeff_movimento.y)
-                {
-                    mappa.secondo_livello[i][j] = player.inventario[TOOLBAR][player.selezione_toolbar];
+            mappa[cursore.y_blocco][cursore.x_blocco] = player.inventario[TOOLBAR][player.selezione_toolbar];
 
-                    if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] > 0)
-                        player.inventario_quantita[TOOLBAR][player.selezione_toolbar]--;
+            if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] > 0)
+                player.inventario_quantita[TOOLBAR][player.selezione_toolbar]--;
 
-                    if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] == 0)
-                        player.inventario[TOOLBAR][player.selezione_toolbar] = 0;
-
-                    return;
-                }
-            }
+            if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] == 0)
+                player.inventario[TOOLBAR][player.selezione_toolbar] = 0;
         }
     }
 }
@@ -254,48 +221,29 @@ void crea_elimina_blocchi(int mappa[][MAXWIDTH], Coeff_Movimento coeff_movimento
     {
         if(is_pressed(VSGL_LSHIFT) || is_pressed(VSGL_RSHIFT))
         {
-            eliminazione_blocco_secondo_livello();
+            eliminazione_blocco_secondo_livello(::mappa.secondo_livello);
         }
         else
         {
-            int mouse_x = get_mouse_x();
-            int mouse_y = get_mouse_y();
-
-            for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
+            player.distruggere_secondo_livello = false;
+            if(blocchi[mappa[cursore.y_blocco][cursore.x_blocco]].distruggi == true)
             {
-                bool esci = false;
-                for(int j =  player.inizio_finestra_x; j <  player.fine_finestra_x; j++)
+                if(player.distruggere == false)
                 {
-                    if(blocchi[mappa[i][j]].distruggi == true)
-                    {
-                        if(mouse_x >= j*WIDTH_BLOCK + coeff_movimento.x && mouse_x <= j*WIDTH_BLOCK+WIDTH_BLOCK + coeff_movimento.x &&
-                           mouse_y >= i*HEIGHT_BLOCK + coeff_movimento.y && mouse_y <= i*HEIGHT_BLOCK+HEIGHT_BLOCK + coeff_movimento.y)
-                        {
-                            esci = true;
-
-                            if(player.distruggere == false)
-                            {
-                                player.timer_blocco_distrutto = ms_time();
-                                player.x_blocco_distrutto = j;
-                                player.y_blocco_distrutto = i;
-                                player.tipo_blocco_distrutto = mappa[i][j];
-                                player.distruggere = true;
-                            }
-                            else if(player.distruggere == true && (player.x_blocco_distrutto != j || player.y_blocco_distrutto != i))
-                            {
-                                player.timer_blocco_distrutto = ms_time();
-                                player.x_blocco_distrutto = j;
-                                player.y_blocco_distrutto = i;
-                                player.tipo_blocco_distrutto = mappa[i][j];
-                                player.distruggere = true;
-                            }
-
-                            return;
-                        }
-                    }
+                    player.timer_blocco_distrutto = ms_time();
+                    player.x_blocco_distrutto = cursore.x_blocco;
+                    player.y_blocco_distrutto = cursore.y_blocco;
+                    player.tipo_blocco_distrutto = mappa[cursore.y_blocco][cursore.x_blocco];
+                    player.distruggere = true;
                 }
-                if(esci == true)
-                    break;
+                else if(player.distruggere == true && (player.x_blocco_distrutto != cursore.x_blocco || player.y_blocco_distrutto != cursore.y_blocco))
+                {
+                    player.timer_blocco_distrutto = ms_time();
+                    player.x_blocco_distrutto = cursore.x_blocco;
+                    player.y_blocco_distrutto = cursore.y_blocco;
+                    player.tipo_blocco_distrutto = mappa[cursore.y_blocco][cursore.x_blocco];
+                    player.distruggere = true;
+                }
             }
         }
     }
@@ -303,33 +251,22 @@ void crea_elimina_blocchi(int mappa[][MAXWIDTH], Coeff_Movimento coeff_movimento
     {
         if(is_pressed(VSGL_LSHIFT) || is_pressed(VSGL_RSHIFT))
         {
-            creazione_blocco_secondo_livello();
+            creazione_blocco_secondo_livello(::mappa.secondo_livello);
         }
         else
         {
-            int mouse_x = get_mouse_x();
-            int mouse_y = get_mouse_y();
-
-            for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
+            player.distruggere_secondo_livello = false;
+            if(blocchi[mappa[cursore.y_blocco][cursore.x_blocco]].distruggi == false)
             {
-                for(int j =  player.inizio_finestra_x; j < player.fine_finestra_x; j++)
+                if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0)
                 {
-                    if(blocchi[mappa[i][j]].distruggi == false)
-                    {
-                        if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0 && mouse_x >= j*WIDTH_BLOCK + coeff_movimento.x && mouse_x <= j*WIDTH_BLOCK+WIDTH_BLOCK + coeff_movimento.x &&
-                           mouse_y >= i*HEIGHT_BLOCK + coeff_movimento.y && mouse_y <= i*HEIGHT_BLOCK+HEIGHT_BLOCK + coeff_movimento.y)
-                        {
-                            mappa[i][j] = player.inventario[TOOLBAR][player.selezione_toolbar];
+                    mappa[cursore.y_blocco][cursore.x_blocco] = player.inventario[TOOLBAR][player.selezione_toolbar];
 
-                            if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] > 0)
-                                player.inventario_quantita[TOOLBAR][player.selezione_toolbar]--;
+                    if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] > 0)
+                        player.inventario_quantita[TOOLBAR][player.selezione_toolbar]--;
 
-                            if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] == 0)
-                                player.inventario[TOOLBAR][player.selezione_toolbar] = 0;
-
-                            return;
-                        }
-                    }
+                    if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] == 0)
+                        player.inventario[TOOLBAR][player.selezione_toolbar] = 0;
                 }
             }
         }
@@ -338,25 +275,17 @@ void crea_elimina_blocchi(int mappa[][MAXWIDTH], Coeff_Movimento coeff_movimento
         player.distruggere = false;
 }
 
-void player_cursor(int mappa[][MAXWIDTH], Coeff_Movimento coeff_movimento)
+void player_cursor(Coeff_Movimento coeff_movimento)
 {
-    int mouse_x = get_mouse_x();
-    int mouse_y = get_mouse_y();
+    cursore.x_blocco = (int)(get_mouse_x() - coeff_movimento.x)/40;
+    cursore.y_blocco = (int)(get_mouse_y() - coeff_movimento.y)/40;
 
-    for(int i = 0; i < MAXHEIGHT; i++)
+    draw_rect(cursore.x_blocco*WIDTH_BLOCK + coeff_movimento.x, cursore.y_blocco*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(50,50,50,255));
+
+    if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0)
     {
-        for(int j = 0; j < MAXWIDTH; j++)
-            if(controllo_collisione(mouse_x, mouse_y, 0, 0, j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK))
-            {
-                draw_rect(j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(50,50,50,255));
-
-                if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0)
-                {
-                    draw_image(blocchi[player.inventario[TOOLBAR][player.selezione_toolbar]].texture,get_mouse_x() - 5, get_mouse_y() - 5, 10, 10, 255);
-                    draw_rect(get_mouse_x() - 6, get_mouse_y() - 6, 12, 12, Color(255,255,255,255));
-                }
-                return;
-            }
+        draw_image(blocchi[player.inventario[TOOLBAR][player.selezione_toolbar]].texture, get_mouse_x() - 5, get_mouse_y() - 5, 10, 10, 255);
+        draw_rect(get_mouse_x() - 6, get_mouse_y() - 6, 12, 12, Color(255,255,255,255));
     }
 }
 
@@ -374,14 +303,15 @@ void gestione_giocatore(int mappa[][MAXWIDTH])
         if(!gestione_inventario())
         {
             int mouse_x = get_mouse_x();
+
+            player_cursor(coeff_movimento);
+
             if(mouse_x >= 661)
                 draw_image("image/alex_destra.png", player.x, player.y, player.width, player.height);
             else if(mouse_x <= 620)
                 draw_image("image/alex_sinistra.png", player.x, player.y, player.width, player.height);
             else
                 draw_image("image/alex_frontale.png", player.x, player.y, player.width, player.height);
-
-            player_cursor(mappa, coeff_movimento);
 
             gestione_toolbar();
 
