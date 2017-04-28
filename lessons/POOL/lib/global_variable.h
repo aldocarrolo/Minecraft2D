@@ -150,6 +150,11 @@ struct Blocco_Droppato  // STRUTTURA CONTENENTE LE COORDINATE E IL TIPO DI BLOCC
 };
 vector<Blocco_Droppato> blocchi_droppati;
 
+struct Blocchi_Inventario   // STRUTTURA CONTENENTE LE COORDINATE DI UN BLOCCO DELL'INVENTARIO
+{
+    int x, y;
+};
+
 
 // vari include delle librerie
 

@@ -174,8 +174,8 @@ bool gestione_crafting_table()
 
                     esci = true;
 
-                    tasto_sinistro_inventario(i, j);
-                    tasto_destro_inventario(i, j);
+                    tasto_sinistro_inventario(&player.inventario[i][j], &player.inventario_quantita[i][j]);
+                    tasto_destro_inventario(&player.inventario[i][j], &player.inventario_quantita[i][j]);
 
                     draw_filled_rect(blocchi_inventario[i][j].x, blocchi_inventario[i][j].y, 32, 32, Color(255,255,255,125));
 
