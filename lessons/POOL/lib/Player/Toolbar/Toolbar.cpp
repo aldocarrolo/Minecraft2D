@@ -26,22 +26,30 @@ void sposta_selezione()
 {
     if(is_pressed(VSGL_1))
         player.selezione_toolbar = 0;
-    if(is_pressed(VSGL_2))
+    else if(is_pressed(VSGL_2))
         player.selezione_toolbar = 1;
-    if(is_pressed(VSGL_3))
+    else if(is_pressed(VSGL_3))
         player.selezione_toolbar = 2;
-    if(is_pressed(VSGL_4))
+    else if(is_pressed(VSGL_4))
         player.selezione_toolbar = 3;
-    if(is_pressed(VSGL_5))
+    else if(is_pressed(VSGL_5))
         player.selezione_toolbar = 4;
-    if(is_pressed(VSGL_6))
+    else if(is_pressed(VSGL_6))
         player.selezione_toolbar = 5;
-    if(is_pressed(VSGL_7))
+    else if(is_pressed(VSGL_7))
         player.selezione_toolbar = 6;
-    if(is_pressed(VSGL_8))
+    else if(is_pressed(VSGL_8))
         player.selezione_toolbar = 7;
-    if(is_pressed(VSGL_9))
+    else if(is_pressed(VSGL_9))
         player.selezione_toolbar = 8;
+
+    player.selezione_toolbar += get_mouse_wheel_y();
+
+    if(player.selezione_toolbar == -1)
+        player.selezione_toolbar = 8;
+
+    if(player.selezione_toolbar == 9)
+        player.selezione_toolbar = 0;
 }
 
 void gestione_toolbar()

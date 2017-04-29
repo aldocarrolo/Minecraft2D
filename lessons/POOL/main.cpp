@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "vsgl2/vsgl2.h"
+#include "../../vsgl2.h"
 
 #include "lib/global_variable.h"
 
@@ -14,8 +14,10 @@ using namespace std;
 using namespace vsgl2;
 using namespace vsgl2::general;
 using namespace vsgl2::video;
-using namespace vsgl2::utils;
+using namespace vsgl2::audio;
 using namespace vsgl2::io;
+using namespace vsgl2::ttf_fonts;
+using namespace vsgl2::utils;
 
 int main(int argc, char* argv[])
 {
@@ -26,6 +28,8 @@ int main(int argc, char* argv[])
 
     init();
     set_window(WIDTH_WINDOW,HEIGHT_WINDOW,"Prova");
+
+    get_mouse_wheel_x();
 
     while(!done() && stato_menu == -1)
     {

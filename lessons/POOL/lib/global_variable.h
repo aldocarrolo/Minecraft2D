@@ -155,11 +155,10 @@ struct Blocchi_Inventario   // STRUTTURA CONTENENTE LE COORDINATE DI UN BLOCCO D
     int x, y;
 };
 
-
 // vari include delle librerie
 
 #include "Blocco/Blocco.h"
 #include "util_library.h"
-#include "lib/Menu/Menu.h"
-#include "lib/Mappa/Mappa.h"
-#include "lib/Player/Player.h"
+#include "Menu/Menu.h"
+#include "Mappa/Mappa.h"
+#include "Player/Player.h"
