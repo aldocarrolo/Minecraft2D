@@ -175,22 +175,24 @@ void animazione_distruzione_blocco(int mappa[][MAXWIDTH], int i, int j, bool *fl
         // SE IL TEMPO PASSATO E' MAGGIORE, ...
         if(ms_time() - player.timer_blocco_distrutto + player.forza_aggiuntiva >= blocchi[player.tipo_blocco_distrutto].secondi)
         {
+            // DIMINUISCO LA DURABILITA' DELLO STRUMENTO
+            if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.strumento == true)
+                player.inventario[TOOLBAR][player.selezione_toolbar].blocco.durabilita--;
+
+            // SE LA DURABILITA' DELLO STRUMENTO E' UGUALE 0
+            if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.durabilita == 0)
+            {
+                // ALLORA LO ELIMINO
+                player.inventario[TOOLBAR][player.selezione_toolbar].blocco = blocchi[0];
+                player.inventario[TOOLBAR][player.selezione_toolbar].quantita = 0;
+            }
+
             // ...SE VIENE UTILIZZATO LO STRUMENTO ADATTO ...
             if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id >= blocchi[mappa[i][j]].da_oggetto && player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id <= blocchi[mappa[i][j]].a_oggetto)
             {
                 // ... E UN VALORE CASUALE RIENTRA NELLA PERCENTUALE DELLO STRUMENTO/BLOCCO
                 if(rand()%100 <= blocchi[mappa[i][j]].percentuale_strumento && blocchi[mappa[i][j]].oggetto_droppato_strumento != 0)
                 {
-                    player.inventario[TOOLBAR][player.selezione_toolbar].blocco.durabilita--;
-
-                    // SE LA DURABILITA' DELLO STRUMENTO E' UGUALE 0
-                    if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.durabilita == 0)
-                    {
-                        // ALLORA LO ELIMINO
-                        player.inventario[TOOLBAR][player.selezione_toolbar].blocco = blocchi[0];
-                        player.inventario[TOOLBAR][player.selezione_toolbar].quantita = 0;
-                    }
-
                     // ALLORA LO DROPPO, CIOE' LO INSERISCO NEL VETTORE blocchi_droppati
                     blocchi_droppati.push_back({j*WIDTH_BLOCK + 15, i*HEIGHT_BLOCK + 15, blocchi[blocchi[mappa[i][j]].oggetto_droppato_strumento]});
                 }
@@ -252,6 +254,8 @@ void eliminazione_blocco(int mappa[][WIDTH_CHUNK*3], bool *flag)
                 player.forza_aggiuntiva = breaking[int_to_string(mappa[cursore.y_blocco][cursore.x_blocco]) + int_to_string(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id)];
             else
                 player.forza_aggiuntiva = 0;
+
+            //if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.strumento == true)
 
             // ALLORA SETTO IL TIMER AL TEMPO ATTUALE
             player.timer_blocco_distrutto = ms_time();

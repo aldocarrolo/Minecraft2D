@@ -228,6 +228,18 @@ bool gestione_crafting_table()
                 if(player.inventario[i][j].blocco.id != 0)
                 {
                     disegna_blocco_inventario(player.inventario[i][j].blocco.id, player.inventario[i][j].quantita, blocchi_inventario[i][j], 32, 32);
+
+                    if(player.inventario[i][j].blocco.strumento == true && player.inventario[i][j].blocco.durabilita < blocchi[player.inventario[i][j].blocco.id].durabilita)
+                    {
+                        float massimo = blocchi[player.inventario[i][j].blocco.id].durabilita;
+                        float attuale = player.inventario[i][j].blocco.durabilita;
+
+                        float rosso = 255 - 255*(attuale/massimo);
+                        float verde = 255*(attuale/massimo);
+
+                        draw_filled_rect(blocchi_inventario[i][j].x + 4, blocchi_inventario[i][j].y + 26, 26, 4, Color(0,0,0,255));
+                        draw_filled_rect(blocchi_inventario[i][j].x + 4, blocchi_inventario[i][j].y + 26, 26.0*(player.inventario[i][j].blocco.durabilita/((float)blocchi[player.inventario[i][j].blocco.id].durabilita)), 2, Color(rosso,verde,0,255));
+                    }
                 }
             }
         }
@@ -239,6 +251,18 @@ bool gestione_crafting_table()
                 if(player.crafting_table[i][j].blocco.id != 0)
                 {
                     disegna_blocco_inventario(player.crafting_table[i][j].blocco.id, player.crafting_table[i][j].quantita, crafting_table[i][j], 32, 32);
+
+                    if(player.crafting_table[i][j].blocco.strumento == true && player.crafting_table[i][j].blocco.durabilita < blocchi[player.crafting_table[i][j].blocco.id].durabilita)
+                    {
+                        float massimo = blocchi[player.crafting_table[i][j].blocco.id].durabilita;
+                        float attuale = player.crafting_table[i][j].blocco.durabilita;
+
+                        float rosso = 255 - 255*(attuale/massimo);
+                        float verde = 255*(attuale/massimo);
+
+                        draw_filled_rect(crafting_table[i][j].x + 4, crafting_table[i][j].y + 26, 26, 4, Color(0,0,0,255));
+                        draw_filled_rect(crafting_table[i][j].x + 4, crafting_table[i][j].y + 26, 26.0*(player.crafting_table[i][j].blocco.durabilita/((float)blocchi[player.crafting_table[i][j].blocco.id].durabilita)), 2, Color(rosso,verde,0,255));
+                    }
                 }
             }
         }
@@ -304,12 +328,25 @@ bool gestione_crafting_table()
         {
             draw_image("item/" + cursore.blocco.blocco.texture, get_mouse_x()-16, get_mouse_y()-16, 32, 32, 255);
 
+            if(cursore.blocco.blocco.strumento == true && cursore.blocco.blocco.durabilita < blocchi[cursore.blocco.blocco.id].durabilita)
+            {
+                float massimo = blocchi[cursore.blocco.blocco.id].durabilita;
+                float attuale = cursore.blocco.blocco.durabilita;
+
+                float rosso = 255 - 255*(attuale/massimo);
+                float verde = 255*(attuale/massimo);
+
+                draw_filled_rect(get_mouse_x() - 16 + 4, get_mouse_y()-16 + 26, 26, 4, Color(0,0,0,255));
+                draw_filled_rect(get_mouse_x() - 16 + 4, get_mouse_y()-16 + 26, 26.0*(cursore.blocco.blocco.durabilita/((float)blocchi[cursore.blocco.blocco.id].durabilita)), 2, Color(rosso,verde,0,255));
+            }
+
             if(cursore.blocco.quantita > 1)
             {
                 string quantita;
 
                 if(cursore.blocco.quantita < 10)
                     quantita = "  ";
+
                 quantita += int_to_string(cursore.blocco.quantita);
                 disegna_testo("font/Minecraftia-Regular.ttf", 15, quantita, get_mouse_x()-16+14, get_mouse_y()-16+14, Color(255,255,255,255));
             }

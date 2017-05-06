@@ -23,6 +23,18 @@ void disegna_blocchi_toolbar()
             // DISEGNO IL BLOCCO
             draw_image("item/" + blocchi[player.inventario[TOOLBAR][i].blocco.id].texture, WIDTH_WINDOW/2 - 182 + 40*i + 5.5, HEIGHT_WINDOW - 44-1 + 7, 32,32,255);
 
+            if(player.inventario[TOOLBAR][i].blocco.strumento == true && player.inventario[TOOLBAR][i].blocco.durabilita < blocchi[player.inventario[TOOLBAR][i].blocco.id].durabilita)
+            {
+                float massimo = blocchi[player.inventario[TOOLBAR][i].blocco.id].durabilita;
+                float attuale = player.inventario[TOOLBAR][i].blocco.durabilita;
+
+                float rosso = 255 - 255*(attuale/massimo);
+                float verde = 255*(attuale/massimo);
+
+                draw_filled_rect(WIDTH_WINDOW/2 - 182 + 40*i + 9.5, HEIGHT_WINDOW - 44-1 + 33, 26, 4, Color(0,0,0,255));
+                draw_filled_rect(WIDTH_WINDOW/2 - 182 + 40*i + 9.5, HEIGHT_WINDOW - 44-1 + 33, 26.0*(player.inventario[TOOLBAR][i].blocco.durabilita/((float)blocchi[player.inventario[TOOLBAR][i].blocco.id].durabilita)), 2, Color(rosso,verde,0,255));
+            }
+
             if(player.inventario[TOOLBAR][i].quantita > 1)
             {
                 // CON IL NUMERO CHE INDICA LA QUANTITA' DEI BLOCCHI CONTENUTI
