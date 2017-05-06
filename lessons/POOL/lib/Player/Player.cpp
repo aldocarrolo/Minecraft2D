@@ -172,13 +172,39 @@ void animazione_distruzione_blocco(int mappa[][MAXWIDTH], int i, int j, bool *fl
     // SE IL FLAG E' SETTATO A true
     if(*flag_livello == true)
     {
-        // SE IL TEMPO PASSATO E' MAGGIORE
-        if(ms_time() - player.timer_blocco_distrutto >= blocchi[player.tipo_blocco_distrutto].secondi)
+        // SE IL TEMPO PASSATO E' MAGGIORE, ...
+        if(ms_time() - player.timer_blocco_distrutto + player.forza_aggiuntiva >= blocchi[player.tipo_blocco_distrutto].secondi)
         {
-            // E LA FORZA DEL GIOCATORE E' MAGIORE DELLA DUREZZA DEL BLOCCO
-            if(player.forza >= blocchi[mappa[i][j]].durezza)
-                // ALLORA LO DROPPO, CIOE' LO INSERISCO NEL VETTORE blocchi_droppati
-                blocchi_droppati.push_back({j*WIDTH_BLOCK + 15, i*HEIGHT_BLOCK + 15, blocchi[mappa[i][j]].oggetto_droppato});
+            // ...SE VIENE UTILIZZATO LO STRUMENTO ADATTO ...
+            if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id >= blocchi[mappa[i][j]].da_oggetto && player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id <= blocchi[mappa[i][j]].a_oggetto)
+            {
+                // ... E UN VALORE CASUALE RIENTRA NELLA PERCENTUALE DELLO STRUMENTO/BLOCCO
+                if(rand()%100 <= blocchi[mappa[i][j]].percentuale_strumento && blocchi[mappa[i][j]].oggetto_droppato_strumento != 0)
+                {
+                    player.inventario[TOOLBAR][player.selezione_toolbar].blocco.durabilita--;
+
+                    // SE LA DURABILITA' DELLO STRUMENTO E' UGUALE 0
+                    if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.durabilita == 0)
+                    {
+                        // ALLORA LO ELIMINO
+                        player.inventario[TOOLBAR][player.selezione_toolbar].blocco = blocchi[0];
+                        player.inventario[TOOLBAR][player.selezione_toolbar].quantita = 0;
+                    }
+
+                    // ALLORA LO DROPPO, CIOE' LO INSERISCO NEL VETTORE blocchi_droppati
+                    blocchi_droppati.push_back({j*WIDTH_BLOCK + 15, i*HEIGHT_BLOCK + 15, blocchi[blocchi[mappa[i][j]].oggetto_droppato_strumento]});
+                }
+            }
+            // ALTRIMENTI SE NON UTILIZZO LO STRUMENTO ADATTO
+            else
+            {
+                // PERO' LA PERCENTUALE RIENTRA COMUNQUE
+                if(rand()%100 <= blocchi[mappa[i][j]].percentuale_senza_strumento && blocchi[mappa[i][j]].oggetto_droppato_senza_strumento != 0)
+                {
+                    // ALLORA LO DROPPO L'OGGETTO CHE VERREBBE DROPPATO SENZA STRUMENTO, CIOE' LO INSERISCO NEL VETTORE blocchi_droppati
+                    blocchi_droppati.push_back({j*WIDTH_BLOCK + 15, i*HEIGHT_BLOCK + 15, blocchi[blocchi[mappa[i][j]].oggetto_droppato_senza_strumento]});
+                }
+            }
 
             // E SETTO IL BLOCCO DELLA MAPPA A 0
             mappa[player.y_blocco_distrutto][player.x_blocco_distrutto] = 0;
@@ -196,7 +222,7 @@ void animazione_distruzione_blocco(int mappa[][MAXWIDTH], int i, int j, bool *fl
 
             for(int i = 1; i <= 10; i++)
             {
-                if(ms_time() - player.timer_blocco_distrutto > blocchi[player.tipo_blocco_distrutto].secondi/10*i)
+                if(ms_time() - player.timer_blocco_distrutto > (blocchi[player.tipo_blocco_distrutto].secondi - player.forza_aggiuntiva)/10*i)
                     numero = i;
                 else
                     break;
@@ -222,8 +248,14 @@ void eliminazione_blocco(int mappa[][WIDTH_CHUNK*3], bool *flag)
         // ... E IL FLAG E' SETTATO A FALSE
         if(*flag == false)
         {
+            if(breaking[int_to_string(mappa[cursore.y_blocco][cursore.x_blocco]) + int_to_string(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id)] != NULL)
+                player.forza_aggiuntiva = breaking[int_to_string(mappa[cursore.y_blocco][cursore.x_blocco]) + int_to_string(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id)];
+            else
+                player.forza_aggiuntiva = 0;
+
             // ALLORA SETTO IL TIMER AL TEMPO ATTUALE
             player.timer_blocco_distrutto = ms_time();
+
             // INDICO LE COORDINATE DEL BLOCCO
             player.x_blocco_distrutto = cursore.x_blocco;
             player.y_blocco_distrutto = cursore.y_blocco;
@@ -248,23 +280,24 @@ void eliminazione_blocco(int mappa[][WIDTH_CHUNK*3], bool *flag)
 void creazione_blocco(int mappa[][WIDTH_CHUNK*3])
 {
     // SE IL BLOCCO DELLA MAPPA E' VUOTO
-    if(blocchi[mappa[cursore.y_blocco][cursore.x_blocco]].distruggi == false)
+    if(blocchi[mappa[cursore.y_blocco][cursore.x_blocco]].id == 0 &&
+       !controllo_collisione(player.x, player.y, player.width, player.height, cursore.x_blocco*WIDTH_BLOCK + coeff_movimento.x, cursore.y_blocco*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK))
     {
         // E NELLA TOOLBAR HO IN MANO UN BLOCCO/OGGETTO CHE SI PUO' "PIAZZARE"
-        if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0)
+        if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.blocco == true &&
+           (mappa[cursore.y_blocco-1][cursore.x_blocco] != 0 || mappa[cursore.y_blocco+1][cursore.x_blocco] != 0 || mappa[cursore.y_blocco][cursore.x_blocco-1] != 0 || mappa[cursore.y_blocco][cursore.x_blocco+1] != 0 || ::mappa.secondo_livello[cursore.y_blocco][cursore.x_blocco] != 0))
         {
             // ALLORA SETTO IL BLOCCO CHE INDICA IL CURSORE A QUELLO DELLA TOOLBAR
-            mappa[cursore.y_blocco][cursore.x_blocco] = player.inventario[TOOLBAR][player.selezione_toolbar];
+            mappa[cursore.y_blocco][cursore.x_blocco] = player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id;
 
             // SE LA QUANTITA' DEL BLOCCO TENUTO IN MANO DAL GIOCATORE E' MAGGIORE A 0
-            if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] > 0)
+            if(player.inventario[TOOLBAR][player.selezione_toolbar].quantita > 0)
                 // ALLORA DECREMENTO IL BLOCCO ONTENUTO NELLA TOOLBAR
-                player.inventario_quantita[TOOLBAR][player.selezione_toolbar]--;
-
+                player.inventario[TOOLBAR][player.selezione_toolbar].quantita--;
             // SE INVECE E' UGUALE A 0
-            if(player.inventario_quantita[TOOLBAR][player.selezione_toolbar] == 0)
+            if(player.inventario[TOOLBAR][player.selezione_toolbar].quantita == 0)
                 // ALLORA SETTO IL BLOCCO STESSO A 0 (BLOCCO VUOTO)
-                player.inventario[TOOLBAR][player.selezione_toolbar] = 0;
+                player.inventario[TOOLBAR][player.selezione_toolbar].blocco = blocchi[0];
         }
     }
 }
@@ -304,7 +337,7 @@ void crea_elimina_blocchi(int mappa[][MAXWIDTH], Coeff_Movimento coeff_movimento
         }
     }
     // MENTRE SE PREMO TASTO DESTRO E IL GIOCATORE SELEZIONA UN BLOCCO CHE SI PUO' PIAZZARE
-    else if(mouse_right_button_pressed() && blocchi[player.inventario[TOOLBAR][player.selezione_toolbar]].blocco == true)
+    else if(mouse_right_button_pressed())
     {
         // E PREMO IL TASTO DESTRO/SINISTRO SHIFT
         if(is_pressed(VSGL_LSHIFT) || is_pressed(VSGL_RSHIFT))
@@ -315,7 +348,10 @@ void crea_elimina_blocchi(int mappa[][MAXWIDTH], Coeff_Movimento coeff_movimento
             creazione_blocco(mappa);
     }
     else
+    {
         player.distruggere = false;
+        player.distruggere_secondo_livello = false;
+    }
 }
 
 // FUNZIONE CHE GESTISCE IL CURSORE
@@ -330,10 +366,10 @@ void player_cursor(Coeff_Movimento coeff_movimento)
     draw_rect(cursore.x_blocco*WIDTH_BLOCK + coeff_movimento.x, cursore.y_blocco*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(50,50,50,255));
 
     // SE LA SELEZIONE DELLA TOOLBAR E' DIVERSA DA 0
-    if(player.inventario[TOOLBAR][player.selezione_toolbar] != 0)
+    if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id != 0)
     {
         // ALLORA DISEGNO IL BLOCCO SELEZIONATO
-        draw_image(blocchi[player.inventario[TOOLBAR][player.selezione_toolbar]].texture, get_mouse_x() - 5, get_mouse_y() - 5, 10, 10, 255);
+        draw_image(blocchi[player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id].texture, get_mouse_x() - 5, get_mouse_y() - 5, 10, 10, 255);
         draw_rect(get_mouse_x() - 6, get_mouse_y() - 6, 12, 12, Color(255,255,255,255));
     }
 }
@@ -350,6 +386,19 @@ void gestione_giocatore(int mappa[][MAXWIDTH])
     player.fine_finestra_x = min((int)(player.x - coeff_movimento.x)/(WIDTH_BLOCK) + 20, WIDTH_CHUNK*3);
     player.fine_finestra_y = min((int)(player.y - coeff_movimento.y)/(HEIGHT_BLOCK) + 20, HEIGHT_CHUNK);
 
+    // AVVIO LA FUNZIONE DELLA GESTIONE DELLA TOOLBAR...
+    gestione_toolbar();
+
+    // DISEGNO IL GIOCATORE
+    int mouse_x = get_mouse_x();
+    if(mouse_x >= 661)
+        draw_image("image/alex_destra.png", player.x, player.y, player.width, player.height);
+    else if(mouse_x <= 620)
+        draw_image("image/alex_sinistra.png", player.x, player.y, player.width, player.height);
+    else
+        draw_image("image/alex_frontale.png", player.x, player.y, player.width, player.height);
+
+
     // SE IL GIOCATORE NON HA SELEZIONATO LA CRAFTING TABLE
     if(!gestione_crafting_table())
     {
@@ -358,18 +407,6 @@ void gestione_giocatore(int mappa[][MAXWIDTH])
         {
             // AVVIO LA FUNZIONE DEL CURSORE
             player_cursor(coeff_movimento);
-
-            // DISEGNO IL GIOCATORE
-            int mouse_x = get_mouse_x();
-            if(mouse_x >= 661)
-                draw_image("image/alex_destra.png", player.x, player.y, player.width, player.height);
-            else if(mouse_x <= 620)
-                draw_image("image/alex_sinistra.png", player.x, player.y, player.width, player.height);
-            else
-                draw_image("image/alex_frontale.png", player.x, player.y, player.width, player.height);
-
-            // AVVIO LA FUNZIONE DELLA GESTIONE DELLA TOOLBAR...
-            gestione_toolbar();
 
             // ...DEL MOVIMENTO DEL GICOATORE...
             movimento_giocatore(&player, &coeff_movimento, mappa);
@@ -396,14 +433,30 @@ void preleva_informazioni_giocatore()
     for(int i = 0; i < HEIGHT_INVENTORY; i++)
     {
         for(int j = 0; j < WIDTH_INVENTORY; j++)
-            in >> player.inventario[i][j];
+        {
+            in >> player.inventario[i][j].blocco.id
+            >> player.inventario[i][j].blocco.texture
+            >> player.inventario[i][j].blocco.blocco
+            >> player.inventario[i][j].blocco.strumento
+            >> player.inventario[i][j].blocco.distruggi
+            >> player.inventario[i][j].blocco.trasparenza
+            >> player.inventario[i][j].blocco.secondi
+            >> player.inventario[i][j].blocco.da_oggetto
+            >> player.inventario[i][j].blocco.a_oggetto
+            >> player.inventario[i][j].blocco.percentuale_senza_strumento
+            >> player.inventario[i][j].blocco.oggetto_droppato_senza_strumento
+            >> player.inventario[i][j].blocco.percentuale_strumento
+            >> player.inventario[i][j].blocco.oggetto_droppato_strumento
+            >> player.inventario[i][j].blocco.durabilita
+            >> player.inventario[i][j].blocco.massima_stoccabilita;
+        }
     }
 
     // PRELEVO LA QUANTITA INVENTARIO
     for(int i = 0; i < HEIGHT_INVENTORY; i++)
     {
         for(int j = 0; j < WIDTH_INVENTORY; j++)
-            in >> player.inventario_quantita[i][j];
+            in >> player.inventario[i][j].quantita;
     }
 
     in.close();
@@ -422,7 +475,21 @@ void salva_informazioni_giocatore()
     for(int i = 0; i < HEIGHT_INVENTORY; i++)
     {
         for(int j = 0; j < WIDTH_INVENTORY; j++)
-            out << player.inventario[i][j] << " ";
+            out << player.inventario[i][j].blocco.id << " "
+            << player.inventario[i][j].blocco.texture << " "
+            << player.inventario[i][j].blocco.blocco << " "
+            << player.inventario[i][j].blocco.strumento << " "
+            << player.inventario[i][j].blocco.distruggi << " "
+            << player.inventario[i][j].blocco.trasparenza << " "
+            << player.inventario[i][j].blocco.secondi << " "
+            << player.inventario[i][j].blocco.da_oggetto << " "
+            << player.inventario[i][j].blocco.a_oggetto << " "
+            << player.inventario[i][j].blocco.percentuale_senza_strumento << " "
+            << player.inventario[i][j].blocco.oggetto_droppato_senza_strumento << " "
+            << player.inventario[i][j].blocco.percentuale_strumento << " "
+            << player.inventario[i][j].blocco.oggetto_droppato_strumento << " "
+            << player.inventario[i][j].blocco.durabilita << " "
+            << player.inventario[i][j].blocco.massima_stoccabilita << endl;
         out << endl;
     }
 
@@ -430,7 +497,7 @@ void salva_informazioni_giocatore()
     for(int i = 0; i < HEIGHT_INVENTORY; i++)
     {
         for(int j = 0; j < WIDTH_INVENTORY; j++)
-            out << player.inventario_quantita[i][j] << " ";
+            out << player.inventario[i][j].quantita << " ";
         out << endl;
     }
 

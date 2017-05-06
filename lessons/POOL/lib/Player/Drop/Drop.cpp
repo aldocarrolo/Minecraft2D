@@ -6,9 +6,9 @@ bool cerca_posto(int k)
     {
         for(int i = 0; i < WIDTH_INVENTORY; i++)
         {
-            if(player.inventario[TOOLBAR][i] == blocchi_droppati[k].type && player.inventario_quantita[TOOLBAR][i] < 64)
+            if(player.inventario[TOOLBAR][i].blocco.id == blocchi_droppati[k].blocco.id && player.inventario[TOOLBAR][i].quantita < player.inventario[TOOLBAR][i].blocco.massima_stoccabilita)
             {
-                player.inventario_quantita[TOOLBAR][i]++;
+                player.inventario[TOOLBAR][i].quantita++;
                 trovato = true;
                 break;
             }
@@ -21,9 +21,9 @@ bool cerca_posto(int k)
         {
             for(int j = 0; j < WIDTH_INVENTORY; j++)
             {
-                if(player.inventario[i][j] == blocchi_droppati[k].type && player.inventario_quantita[i][j] < 64)
+                if(player.inventario[i][j].blocco.id == blocchi_droppati[k].blocco.id && player.inventario[i][j].quantita < player.inventario[i][j].blocco.massima_stoccabilita)
                 {
-                    player.inventario_quantita[i][j]++;
+                    player.inventario[i][j].quantita++;
                     trovato = true;
                     break;
                 }
@@ -38,10 +38,10 @@ bool cerca_posto(int k)
     {
         for(int i = 0; i < WIDTH_INVENTORY; i++)
         {
-            if(player.inventario[TOOLBAR][i] == 0)
+            if(player.inventario[TOOLBAR][i].blocco.id == 0)
             {
-                player.inventario[TOOLBAR][i] = blocchi_droppati[k].type;
-                player.inventario_quantita[TOOLBAR][i]++;
+                player.inventario[TOOLBAR][i].blocco = blocchi_droppati[k].blocco;
+                player.inventario[TOOLBAR][i].quantita++;
                 trovato = true;
                 break;
             }
@@ -55,10 +55,10 @@ bool cerca_posto(int k)
         {
             for(int j = 0; j < WIDTH_INVENTORY; j++)
             {
-                if(player.inventario[i][j] == 0)
+                if(player.inventario[i][j].blocco.id == 0)
                 {
-                    player.inventario[i][j] = blocchi_droppati[k].type;
-                    player.inventario_quantita[i][j]++;
+                    player.inventario[i][j].blocco = blocchi_droppati[k].blocco;
+                    player.inventario[i][j].quantita++;
                     trovato = true;
                     break;
                 }
@@ -103,7 +103,7 @@ void prendi_oggetto()
 void disegna_blocchi_droppati()
 {
     for(int i = 0; i < blocchi_droppati.size(); i++)
-        draw_image(blocchi[blocchi_droppati[i].type].texture, blocchi_droppati[i].x + coeff_movimento.x, blocchi_droppati[i].y + coeff_movimento.y, 10, 10, 255);
+        draw_image(blocchi[blocchi_droppati[i].blocco.id].texture, blocchi_droppati[i].x + coeff_movimento.x, blocchi_droppati[i].y + coeff_movimento.y, 10, 10, 255);
 }
 
 void gravita_blocchi_droppati(int mappa[][MAXWIDTH])

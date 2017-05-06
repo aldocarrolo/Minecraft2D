@@ -12,6 +12,39 @@
 #define WIDTH_INVENTORY 9   // LARGHEZZA MATRICE INVENTARIO
 #define HEIGHT_INVENTORY 4  // ALTEZZA MATRICE INVENTARIO
 #define TOOLBAR 3           // NUMERO DI RIGA DELLA TOOLBAR
+#define MAXID 20             // VALORE CHE INDICA IL VALORE MASSIMO DI OGGETTI
+
+// ID BLOCCHI
+#define AIR 0
+#define GRASS 1
+#define DIRT 2
+#define STONE 3
+#define COBBLESTONE 4
+#define LEAVE 5
+#define OAK_WOOD 6
+#define OAK_PLANK 7
+#define CRAFTING_TABLE 8
+#define COAL_ORE 9
+
+// ID OGGETTI
+#define COAL 10
+#define STICK 11
+#define TORCH 12
+
+// ID STRUMENTI
+// DA MODIFICARE ASSOLUTAMENTE QUANDO AGGIUNGIERO' GLI STRUMENTI NELL'ARRAY CONTENENTE I BLOCCHI
+#define WOOD_PICKAXE 13       // ID DELLA PICCONE DI LEGNO
+#define STONE_PICKAXE 14
+#define DIAMOND_PICKAXE 14       // ID DELLA PICCONE DI DIAMANTE
+#define WOOD_AXE 15
+#define STONE_AXE 16
+#define DIAMOND_AXE 16
+#define WOOD_SHOVEL 17       // ID DELLA PALA DI LEGNO
+#define DIAMOND_SHOVEL 18       // ID DELLA PALA DI DIAMANTE
+#define SHEARS 10
+
+// LIBRERIE DA INCLUDERE
+#include "Blocco/Blocco.h"
 
 int stato_menu = -1;    // VARIABILE CHE INDICA LO STATO DELLA SELEZIONE DEL MENU
 
@@ -20,6 +53,14 @@ struct Coeff_Movimento  // COEFFICIENTE UTILIZZATO PER L'INDIVIDUAZIONE E DISEGN
     float x = -20;
     float y = 0;
 } coeff_movimento;
+
+struct Inventario   // STRUTTURA CONTENENTE LE INFORMAZIONI SULL'INVENTARIO
+{
+    // IL TIPO DI OGGETTO E LE SUE VARIE INFORMAZIONI
+    Blocco blocco = blocchi[0];
+    // IL NUMERO DI OGGETTI CONTENUTI DELLO STESSO TIPO
+    int quantita = 0;
+};
 
 struct p    // STRUTTURA COMPLESSA CONTENENTE LE INFORMAZIONI RIGUARDANTI IL PERSONAGGIO
 {
@@ -53,62 +94,21 @@ struct p    // STRUTTURA COMPLESSA CONTENENTE LE INFORMAZIONI RIGUARDANTI IL PER
     int fine_finestra_y = min((int)(this->y - coeff_movimento.y)/(HEIGHT_BLOCK) + WIDTH_CHUNK + 20, HEIGHT_CHUNK);
 
     // MATRICE CONTENENTE I TIPO DI BLOCCHI CONTENUTI NELL'INVENTARIO
-    int inventario[HEIGHT_INVENTORY][WIDTH_INVENTORY] =
-    {
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-
-        {0,0,0,0,0,0,0,0,0},
-    };
-
-    // MATRICE CONTENENTE LA QUANTITA' DI BLOCCHI CONTENUTI NELL'INVENTARIO
-    int inventario_quantita[HEIGHT_INVENTORY][WIDTH_INVENTORY] =
-    {
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-
-        {0,0,0,0,0,0,0,0,0},
-    };
+    Inventario inventario[HEIGHT_INVENTORY][WIDTH_INVENTORY];
 
     // MATRICE CONTENENTE I TIPI DI BLOCCHI CONTENUTI NELLA CRAFTING DELL'INVENTARIO
-    int crafting[2][2] =
-    {
-        {0, 0},
-        {0, 0},
-    };
-
-    // MATRICE CONTENENTE LA QUANTITA' DI BLOCCHI CONTENUTI NELLA CRAFTING DELL'INVENTARIO
-    int crafting_quantita[2][2] =
-    {
-        {0, 0},
-        {0, 0},
-    };
+    Inventario crafting[2][2];
 
     // VALORI CHE INDICANO IL TIPO DI BLOCCO E LA QUANTITA DI BLOCCHI CHE VENGONO RESTITUITI
     // DURANTE IL CRAFTING DI UN'OGGETTO
-    int oggetto_risultato_crafting = 0, quantita_risultato_crafting = 0;
+    Inventario oggetto_risultato_crafting;
 
     // MATRICE CONTENENTE I TIPI DI BLOCCHI CONTENUTI NELLA CRAFTING TABLE IN CUI SI TROVA
-    int crafting_table[3][3] =
-    {
-        {0, 0, 0},
-        {0, 0, 0},
-        {0, 0, 0},
-    };
-
-    // MATRICE CONTENENTE LA QUANTITA' DI BLOCCHI CONTENUTI NELLA CRAFTING TABLE IN CUI SI TROVA
-    int crafting_table_quantita[3][3] =
-    {
-        {0, 0, 0},
-        {0, 0, 0},
-        {0, 0, 0},
-    };
+    Inventario crafting_table[3][3];
 
     // VALORI CHE INDICANO IL TIPO DI BLOCCO E LA QUANTITA DI BLOCCHI CHE VENGONO RESTITUITI
     // DURANTE IL CRAFTING DI UN'OGGETTO NELLA CRAFTING TABLE
-    int oggetto_risultato_crafting_table = 0, quantita_risultato_crafting_table = 0;
+    Inventario oggetto_risultato_crafting_table;
 
     // TIMER CHE INDICA LA VELOCITA DI SPACCATURA DI UN BLOCCCO
     int timer_blocco_distrutto = 0;
@@ -117,9 +117,11 @@ struct p    // STRUTTURA COMPLESSA CONTENENTE LE INFORMAZIONI RIGUARDANTI IL PER
     bool distruggere = false;
     bool distruggere_secondo_livello = false;
 
-    // VARIABILE CONTENENTE L'INFORMAZIONE SULLA FORZA DEL PERSONAGGIO
-    // QUESTA SERVIRA' PER POI VEDERE QUANDO IL GIOCATORE PUO' SPACCARE UN BLOCCO O MENO
-    int forza = 0;
+    // VARIABILE CHE INDICA UN'AGGIUNTA DI TEMPO SE IL GIOCATORE UTILIZZA UNO STRUMENTO
+    // CIOE' SE IL GIOCATORE UTILIZZA UNO STRUMENTO SPECIFICO ALLORA  SI AUMENTA IN BASE
+    // ALLORA STRUMENTO UTILIZZATO
+    // QUESTO PERCHE' UN BLOCCO POSSA ESSERE SPACCATO IL PIU' VELOCEMENTE
+    int forza_aggiuntiva = 0;
 
 } player;
 
@@ -128,25 +130,27 @@ struct Cursore  // STRUTTURA CONTENENTE LE INFORMAZIONI SUL CURSORE
     int x, y;
     int x_blocco, y_blocco; // COORDINATE DEL BLOCCO CHE INDICA IL CURSORE NELLA MAPPA
 
-    int type = 0, quantita = 0; // TIPO E QUANTITA DI BLOCCHI CHE SONO SELEZIONATI DAL CURSORE
+    // IL TIPO DI OGGETTO E LE SUE VARIE INFORMAZIONI
+    Inventario blocco;
 
 } cursore;
 
 // DISEGNO DELL'ALBERO NELLA MAPPA
 int albero[6][5] =
 {
-    {0,4,4,4,0},
-    {0,4,4,4,0},
-    {4,4,4,4,4},
-    {4,4,4,4,4},
-    {0,0,5,0,0},
-    {0,0,5,0,0},
+    {0,         LEAVE,      LEAVE,          LEAVE,      0},
+    {0,         LEAVE,      LEAVE,          LEAVE,      0},
+    {LEAVE,     LEAVE,      LEAVE,          LEAVE,      LEAVE},
+    {LEAVE,     LEAVE,      LEAVE,          LEAVE,      LEAVE},
+    {0,         0,          OAK_WOOD,       0,          0},
+    {0,         0,          OAK_WOOD,       0,          0},
 };
 
 struct Blocco_Droppato  // STRUTTURA CONTENENTE LE COORDINATE E IL TIPO DI BLOCCO DROPPATO
 {
     float x, y;
-    int type;
+
+    Blocco blocco;
 };
 vector<Blocco_Droppato> blocchi_droppati;
 
@@ -157,8 +161,9 @@ struct Blocchi_Inventario   // STRUTTURA CONTENENTE LE COORDINATE DI UN BLOCCO D
 
 // vari include delle librerie
 
-#include "Blocco/Blocco.h"
 #include "util_library.h"
+#include "Crafting/Crafting.h"
+#include "Breaking/Breaking.h"
 #include "Menu/Menu.h"
 #include "Mappa/Mappa.h"
 #include "Player/Player.h"

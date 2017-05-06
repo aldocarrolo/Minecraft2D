@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "../../vsgl2.h"
 
@@ -29,7 +30,10 @@ int main(int argc, char* argv[])
     init();
     set_window(WIDTH_WINDOW,HEIGHT_WINDOW,"Prova");
 
-    get_mouse_wheel_x();
+    // CARICAMENTO DEL CRAFTING IN MEMORIA
+    caricamento_crafting();
+    // CARICAMENTO DELLE INFORMAZIONI SUI TEMPI DI ROTTURA IN MEMORIA
+    caricamento_breaking();
 
     while(!done() && stato_menu == -1)
     {
@@ -40,9 +44,13 @@ int main(int argc, char* argv[])
     if(stato_menu == 1)
     {
         mappa.crea();
-        salva_informazioni_giocatore();
+        //salva_informazioni_giocatore();
         stato_menu = 2;
+    }
 
+
+    if(stato_menu == 2)
+    {
         ifstream in("save/map_info.save");
         int temp, chunk;
         in >> temp >> chunk;
@@ -50,17 +58,21 @@ int main(int argc, char* argv[])
 
         mappa.preleva(chunk);
         preleva_informazioni_giocatore();
-    }
 
-    if(stato_menu == 2)
-    {
         while(!done())
         {
             mappa.update();
+
             gestione_giocatore(mappa.mappa);
+
             //delay_fps(60);
             update();
         }
+
+        mappa.salva(mappa.chunk_attuale);
+        salva_informazioni_giocatore();
+
+        stato_menu = 0;
     }
 
     if(stato_menu != 0 && stato_menu != -1)

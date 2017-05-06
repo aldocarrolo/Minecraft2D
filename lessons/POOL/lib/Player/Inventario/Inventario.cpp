@@ -1,4 +1,5 @@
 // BLOCCHI CHE INDICANO LE VARIE POSIZIONI DELL'INVENTARIO
+// NELLA FINESTRA DI GIOCO
 Blocchi_Inventario blocchi_inventario[HEIGHT_INVENTORY + 3][WIDTH_INVENTORY] =
 {
     // BLOCCHI INVENTARIO
@@ -74,15 +75,17 @@ void disegna_inventario()
 void disegna_blocco_inventario(int posizione, int quantita, Blocchi_Inventario coordinate, int width, int height)
 {
     // DISEGNO IL BLOCCO
-    draw_image(blocchi[posizione].texture, coordinate.x + 6, coordinate.y + 6, width,height, 255);
-    // E UNO QUADRATO "SEMI" TRASPARENTE
-    draw_filled_rect(coordinate.x + 5, coordinate.y + 5, width, height, Color(0,0,0,50));
-    // DISEGNO IL SUO CONTORNO
-    draw_rect(coordinate.x + 5, coordinate.y + 5, width + 2,height + 2, Color(0,0,0,255));
+    draw_image("item/" + blocchi[posizione].texture, coordinate.x, coordinate.y, width,height, 255);
 
     // E INFINE IL NUMERO DI QUANTITA' DEL BLOCCO
-    string numero = int_to_string(quantita);
-    disegna_testo("font/Minecraftia-Regular.ttf", 13, numero,  coordinate.x + 16, coordinate.y + 16, Color(255,255,255,255));
+    if(quantita > 1)
+    {
+        string numero;
+        if(quantita < 10)
+            numero = "  ";
+         numero += int_to_string(quantita);
+        disegna_testo("font/Minecraftia-Regular.ttf", 15, numero,  coordinate.x + 14, coordinate.y + 14, Color(255,255,255,255));
+    }
 }
 
 // FUNZIONE CHE PERMETTE DI RILEVARE UNA SOLA VOLTA LA PRESSIONE DI UN TASTO
@@ -106,7 +109,7 @@ bool bottone_premuto()
 
 // FUNZIONE PER IL "TRASPORTO" O "INSERIMENTO" DI UN BLOCCO ALL'INTERNO DI UN POSTO
 // NELL'INVENTARIO
-void tasto_sinistro_inventario(int *posizione, int *quantita)
+void tasto_sinistro_inventario(Inventario &selezione)
 {
     static int tasto_sinistro_inventaro = 0;
 
@@ -115,46 +118,51 @@ void tasto_sinistro_inventario(int *posizione, int *quantita)
         tasto_sinistro_inventaro  = 1;
 
         // SE IL CURSORE E' VUOTO ALLORA INSERISCO IL BLOCCO NEL CURSORE
-        if(cursore.type == 0)
+        if(cursore.blocco.blocco.id == 0)
         {
-            cursore.type = *posizione;
-            cursore.quantita = *quantita;
-            *posizione = 0;
-            *quantita = 0;
+            cursore.blocco.blocco = selezione.blocco;
+            cursore.blocco.quantita = selezione.quantita;
+            selezione.blocco = blocchi[0];
+            selezione.quantita = 0;
         }
         else
         {
             // SE IL CURSORE E' VUOTO E IL BLOCCO NELL'INVENTARIO E' VUOTO
             // ALLORA INSERISCO IL BLOCCO DAL CURSORE AL POSTO
-            if(*posizione == 0)
+            if(selezione.blocco.id == 0)
             {
-                *posizione = cursore.type;
-                *quantita = cursore.quantita;
-                cursore.type = 0;
-                cursore.quantita = 0;
+                selezione.blocco = cursore.blocco.blocco;
+                selezione.quantita = cursore.blocco.quantita;
+                cursore.blocco.blocco = blocchi[0];
+                cursore.blocco.quantita = 0;
             }
             // ALTRIMENTI SE IL BLOCCO NEL CURSORE E' UGUALE AL BLOCCO NEL POSTO DELL'INVENTARIO
             // ALLORA LO AGGIUNGO AI BLOCCHI DELL'INVENTARIO
-            else if(*posizione == cursore.type)
+            else if(selezione.blocco.id == cursore.blocco.blocco.id)
             {
-                *quantita += cursore.quantita;
-
-                if(*quantita > 64)
+                // SE LA SELEZIONE E' MAGGIORE RISPETTO AL VALORE MASSIMO DI STOCCABILITA'
+                if(selezione.quantita + cursore.blocco.quantita > blocchi[selezione.blocco.id].massima_stoccabilita)
                 {
-                    cursore.quantita = *quantita - 64;
-                    *quantita = 64;
+                    // ALLORA SETTO COME LA DIFFERENZA TRA LA QUANTITA E LA MASSIMA STOCCABILITA' IL CURSORE
+                    cursore.blocco.quantita = selezione.quantita + cursore.blocco.quantita - blocchi[selezione.blocco.id].massima_stoccabilita;
+                    // E SETTO LA QUANTITA' DELLA SELEZIONE COME IL VALORE MASSIMO DI STOCCABILITA'
+                    selezione.quantita = blocchi[selezione.blocco.id].massima_stoccabilita;
                 }
                 else
                 {
-                    cursore.type = 0;
-                    cursore.quantita = 0;
+                    // ALTRIMENTO SETTO SOMMO ALLA QUANITTA' DELLA SELEZIONE LA QUANTITA' DEL CURSORE E...
+                    selezione.quantita += cursore.blocco.quantita;
+
+                    // ... SETTO COME BLOCCO VUOTO IL CURSORE
+                    cursore.blocco.blocco = blocchi[0];
+                    cursore.blocco.quantita = 0;
                 }
             }
             // ALTRIMENTI SCAMBIO IL BLOCCO DEL CURSORE CON QUELLO DELL'INVENTARIO
             else
             {
-                swap(*posizione, cursore.type);
-                swap(*quantita, cursore.quantita);
+                swap(selezione.blocco, cursore.blocco.blocco);
+                swap(selezione.quantita, cursore.blocco.quantita);
             }
         }
     }
@@ -164,7 +172,7 @@ void tasto_sinistro_inventario(int *posizione, int *quantita)
 }
 
 // FUNZIONE CHE PERMETTE DI PREMERE IL TASTO DESTRO PER FAR ESEGUIRE UNO SPECIFICO EVENTO
-void tasto_destro_inventario(int *posizione, int *quantita)
+void tasto_destro_inventario(Inventario &selezione)
 {
     static int tasto_destro_inventaro = 0;
 
@@ -173,33 +181,34 @@ void tasto_destro_inventario(int *posizione, int *quantita)
         tasto_destro_inventaro  = 1;
 
         // SE IL CURSORE NON E' VUOTOT
-        if(cursore.type != 0)
+        if(cursore.blocco.blocco.id != 0)
         {
             // E LA POSIZIONE NELL'INVENTARIO E' VUOTA
             // ALLORA INSERISCO UN SOLO BLOCCO
-            if(*posizione == 0)
+            if(selezione.blocco.id == 0)
             {
-                cursore.quantita--;
-                *posizione = cursore.type;
-                *quantita = *quantita + 1;
+                selezione.blocco = cursore.blocco.blocco;
+                cursore.blocco.quantita--;
 
-                if(cursore.quantita == 0)
-                    cursore.type = 0;
+                selezione.quantita = 1;
+
+                if(cursore.blocco.quantita == 0)
+                    cursore.blocco.blocco = blocchi[0];
             }
             // ALTRIMENTI SE LA QUANTITA E' COMPRESA TRA 0 E 64 ALLORA INSERISCO UN BLOCCO
-            else if(*posizione == cursore.type && *quantita < 64 && *quantita > 0)
+            else if(cursore.blocco.blocco.id == selezione.blocco.id && selezione.quantita < blocchi[cursore.blocco.blocco.id].massima_stoccabilita && selezione.quantita > 0)
             {
-                cursore.quantita--;
-                *quantita = *quantita + 1;
+                cursore.blocco.quantita--;
+                selezione.quantita = selezione.quantita + 1;
 
-                if(cursore.quantita == 0)
-                    cursore.type = 0;
+                if(cursore.blocco.quantita == 0)
+                    cursore.blocco.blocco = blocchi[0];
             }
             // ALTRIMENTI SE I TIPI DI BLOCCHI SONO DIVERSI SCAMBIO I BLOCCHI
-            else if(*posizione != 0)
+            else if(selezione.blocco.id != 0)
             {
-                swap(*posizione, cursore.type);
-                swap(*quantita, cursore.quantita);
+                swap(selezione.blocco, cursore.blocco.blocco);
+                swap(selezione.quantita, cursore.blocco.quantita);
             }
         }
     }
@@ -212,32 +221,29 @@ void tasto_destro_inventario(int *posizione, int *quantita)
 void controllo_crafting()
 {
     // MI CREO LA STRINGA CHE SARA' IL NOME DEL FILE
-    string file = "crafting/";
+    string file;
     for(int i = 0; i < 2; i++)
         for(int j = 0; j < 2; j++)
-            file += int_to_string(player.crafting[i][j]);
-
-    file += ".save";
-
-    // ACCEDO AL FILE
-    ifstream in(file);
+            file += int_to_string(player.crafting[i][j].blocco.id);
 
     // SE IL FILE ESISTE ALLORA PRELEVO IL TIPO DI BLOCCO CHE MI VIENE RESTITUITO
     // E LA SUA QUANTIA'
-    if(in != NULL)
+    if(crafting[file].first != NULL)
     {
         int valore, quantita;
-        in >> valore >> quantita;
+        valore = crafting[file].first;
+        quantita = crafting[file].second;
 
-        player.oggetto_risultato_crafting = valore;
-        player.quantita_risultato_crafting = quantita;
+        player.oggetto_risultato_crafting.blocco = blocchi[valore];
+        player.oggetto_risultato_crafting.quantita = quantita;
 
-        disegna_blocco_inventario(player.oggetto_risultato_crafting, player.quantita_risultato_crafting, risultato_crafting, 20, 20);
+        disegna_blocco_inventario(player.oggetto_risultato_crafting.blocco.id, player.oggetto_risultato_crafting.quantita, risultato_crafting, 32, 32);
     }
     else
-        player.oggetto_risultato_crafting = 0;
-
-    in.close();
+    {
+        player.oggetto_risultato_crafting.blocco = blocchi[0];
+        player.oggetto_risultato_crafting.quantita = 0;
+    }
 }
 
 bool gestione_inventario()
@@ -264,8 +270,8 @@ bool gestione_inventario()
 
                     esci = true;
 
-                    tasto_sinistro_inventario(&player.inventario[i][j], &player.inventario_quantita[i][j]);
-                    tasto_destro_inventario(&player.inventario[i][j], &player.inventario_quantita[i][j]);
+                    tasto_sinistro_inventario(player.inventario[i][j]);
+                    tasto_destro_inventario(player.inventario[i][j]);
 
                     draw_filled_rect(blocchi_inventario[i][j].x, blocchi_inventario[i][j].y, 32, 32, Color(255,255,255,125));
 
@@ -289,8 +295,8 @@ bool gestione_inventario()
 
                     esci = true;
 
-                    tasto_sinistro_inventario(&player.crafting[i][j], &player.crafting_quantita[i][j]);
-                    tasto_destro_inventario(&player.crafting[i][j], &player.crafting_quantita[i][j]);
+                    tasto_sinistro_inventario(player.crafting[i][j]);
+                    tasto_destro_inventario(player.crafting[i][j]);
 
                     draw_filled_rect(crafting_inventario[i][j].x, crafting_inventario[i][j].y, 32, 32, Color(255,255,255,125));
 
@@ -305,79 +311,88 @@ bool gestione_inventario()
         // DISEGNO DEI BLOCCHI DELL'INVENTARIO
         for(int i = 0; i < HEIGHT_INVENTORY; i++)
             for(int j = 0; j < WIDTH_INVENTORY; j++)
-                if(player.inventario[i][j] != 0)
-                    disegna_blocco_inventario(player.inventario[i][j], player.inventario_quantita[i][j], blocchi_inventario[i][j], 20, 20);
+                if(player.inventario[i][j].blocco.id != 0)
+                    disegna_blocco_inventario(player.inventario[i][j].blocco.id, player.inventario[i][j].quantita, blocchi_inventario[i][j], 32, 32);
 
         // DISEGNO DEI BLOCCHI DELLA CRAFTING DELL'INVENTARIO
         for(int i = 0; i < 2; i++)
             for(int j = 0; j < 2; j++)
-                if(player.crafting[i][j] != 0)
-                    disegna_blocco_inventario(player.crafting[i][j], player.crafting_quantita[i][j], crafting_inventario[i][j],20, 20);
+                if(player.crafting[i][j].blocco.id != 0)
+                    disegna_blocco_inventario(player.crafting[i][j].blocco.id, player.crafting[i][j].quantita, crafting_inventario[i][j],32, 32);
 
+
+        controllo_crafting();
 
         if(controllo_collisione(get_mouse_x(), get_mouse_y(), 0, 0, risultato_crafting.x, risultato_crafting.y, 32, 32))
         {
-            if((mouse_left_button_pressed() || mouse_right_button_pressed()) && cursore.type == 0)
+            if((controllo_tasto_sinistro_premuto() == true || controllo_tasto_destro_premuto() == true))
             {
-                cursore.type = player.oggetto_risultato_crafting;
-                cursore.quantita = player.quantita_risultato_crafting;
-
-                for(int i = 0; i < 2; i++)
+                if(cursore.blocco.blocco.id == 0 && player.oggetto_risultato_crafting.blocco.id != 0)
                 {
-                    for(int j = 0; j < 2; j++)
+                    cursore.blocco.blocco = player.oggetto_risultato_crafting.blocco;
+                    cursore.blocco.quantita = player.oggetto_risultato_crafting.quantita;
+
+                    for(int i = 0; i < 2; i++)
                     {
-                        if(player.crafting[i][j] != 0 && player.crafting_quantita[i][j] == 1)
+                        for(int j = 0; j < 2; j++)
                         {
-                            player.crafting[i][j] = 0;
-                            player.crafting_quantita[i][j] = 0;
-                        }
-                        else if(player.crafting[i][j] != 0 && player.crafting_quantita[i][j] > 1)
-                        {
-                            player.crafting_quantita[i][j]--;
+                            if(player.crafting[i][j].blocco.id != 0 && player.crafting[i][j].quantita == 1)
+                            {
+                                player.crafting[i][j].blocco = blocchi[0];
+                                player.crafting[i][j].quantita = 0;
+                            }
+                            else if(player.crafting[i][j].blocco.id != 0 && player.crafting[i][j].quantita > 1)
+                            {
+                                player.crafting[i][j].quantita--;
+                            }
                         }
                     }
+
+                    player.oggetto_risultato_crafting.blocco = blocchi[0];
+                    player.oggetto_risultato_crafting.quantita = 0;
                 }
-
-                player.oggetto_risultato_crafting = 0;
-                player.quantita_risultato_crafting = 0;
-            }
-            else if((mouse_left_button_pressed() || mouse_right_button_pressed()) && (cursore.type != 0 && cursore.quantita + player.quantita_risultato_crafting <= 64))
-            {
-                cursore.quantita += player.quantita_risultato_crafting;
-
-                for(int i = 0; i < 2; i++)
+                else if(player.oggetto_risultato_crafting.blocco.id != 0 && (cursore.blocco.blocco.id == player.oggetto_risultato_crafting.blocco.id && cursore.blocco.quantita + player.oggetto_risultato_crafting.quantita <= 64))
                 {
-                    for(int j = 0; j < 2; j++)
+                    cursore.blocco.quantita += player.oggetto_risultato_crafting.quantita;
+
+                    for(int i = 0; i < 2; i++)
                     {
-                        if(player.crafting[i][j] != 0 && player.crafting_quantita[i][j] == 1)
+                        for(int j = 0; j < 2; j++)
                         {
-                            player.crafting[i][j] = 0;
-                            player.crafting_quantita[i][j] = 0;
-                        }
-                        else if(player.crafting[i][j] != 0 && player.crafting_quantita[i][j] > 1)
-                        {
-                            player.crafting_quantita[i][j]--;
+                            if(player.crafting[i][j].blocco.id != 0 && player.crafting[i][j].quantita == 1)
+                            {
+                                player.crafting[i][j].blocco = blocchi[0];
+                                player.crafting[i][j].quantita = 0;
+                            }
+                            else if(player.crafting[i][j].blocco.id != 0 && player.crafting[i][j].quantita > 1)
+                            {
+                                player.crafting[i][j].quantita--;
+                            }
                         }
                     }
-                }
 
-                player.oggetto_risultato_crafting = 0;
-                player.quantita_risultato_crafting = 0;
+                    player.oggetto_risultato_crafting.blocco = blocchi[0];
+                    player.oggetto_risultato_crafting.quantita = 0;
+                }
             }
 
             draw_filled_rect(risultato_crafting.x, risultato_crafting.y, 32, 32, Color(255,255,255,125));
         }
 
-        controllo_crafting();
-
-
-        if(cursore.type != 0)
+        if(cursore.blocco.blocco.id != 0)
         {
-            draw_image(blocchi[cursore.type].texture, get_mouse_x()-11, get_mouse_y()-11, 22, 22, 255);
-            draw_rect(get_mouse_x()-12, get_mouse_y()-12, 24, 24, Color(0,0,0,255));
+            draw_image("item/" + blocchi[cursore.blocco.blocco.id].texture, get_mouse_x()-16, get_mouse_y()-16, 32, 32, 255);
+            //draw_rect(get_mouse_x()-12, get_mouse_y()-12, 24, 24, Color(0,0,0,255));
 
-            string quantita = int_to_string(cursore.quantita);
-            disegna_testo("font/Minecraftia-Regular.ttf", 13, quantita, get_mouse_x()-11+16, get_mouse_y()-11+16, Color(255,255,255,255));
+            if(cursore.blocco.quantita > 1)
+            {
+                string quantita;
+                if(cursore.blocco.quantita < 10)
+                    quantita = "  ";
+
+                quantita += int_to_string(cursore.blocco.quantita);
+                disegna_testo("font/Minecraftia-Regular.ttf", 15, quantita, get_mouse_x()-16+14, get_mouse_y()-16+14, Color(255,255,255,255));
+            }
         }
     }
     else

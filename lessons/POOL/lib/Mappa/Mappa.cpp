@@ -1,17 +1,17 @@
-#include "Sky/Sky.h"
-
 class Mappa
 {
 private:
 public:
     int mappa[HEIGHT_CHUNK][WIDTH_CHUNK*3];
     int secondo_livello[HEIGHT_CHUNK][WIDTH_CHUNK*3];
+    double ombra[HEIGHT_CHUNK][WIDTH_CHUNK*3];
 
     int chunk_iniziale;
     int chunk_finale;
     int chunk_attuale;
 
-    void creazione_caverna(int y, int x, int coeff_casualita);
+    void creazione_ore_chunk(int y, int x, int coeff_casualita, int mappa[][WIDTH_CHUNK], int type_ore);
+    void creazione_ore(int y, int x, int coeff_casualita, int type_ore);
     void crea();
 
     void genera_chunk_sinistra(string file_name);
@@ -27,27 +27,53 @@ public:
     void update();
 } mappa;
 
-void Mappa::creazione_caverna(int y, int x, int coeff_casualita)
+#include "Sky/Sky.h"
+
+void Mappa::creazione_ore(int y, int x, int coeff_casualita, int type_ore)
 {
-    mappa[y][x] = 0;
+    this->mappa[y][x] = type_ore;
 
     if(rand()%100 >= coeff_casualita)
     {
         if(x < WIDTH_CHUNK*3-1)
             if(mappa[y][x+1] != 0)
-                creazione_caverna(y, x+1, coeff_casualita + rand()%15);
+                this->creazione_ore(y, x+1, coeff_casualita + rand()%15, type_ore);
 
         if(x > 0)
             if(mappa[y][x-1] != 0)
-                creazione_caverna(y, x-1, coeff_casualita + rand()%15);
+                this->creazione_ore(y, x-1, coeff_casualita + rand()%15, type_ore);
 
         if(y < HEIGHT_CHUNK-1)
             if(mappa[y+1][x] != 0)
-                creazione_caverna(y+1, x, coeff_casualita + rand()%15);
+                this->creazione_ore(y+1, x, coeff_casualita + rand()%15, type_ore);
 
         if(y > 0)
             if(mappa[y-1][x] != 0)
-                creazione_caverna(y-1, x, coeff_casualita + rand()%15);
+                this->creazione_ore(y-1, x, coeff_casualita + rand()%15, type_ore);
+    }
+}
+
+void Mappa::creazione_ore_chunk(int y, int x, int coeff_casualita, int mappa[][WIDTH_CHUNK], int type_ore)
+{
+    mappa[y][x] = type_ore;
+
+    if(rand()%100 >= coeff_casualita)
+    {
+        if(x < WIDTH_CHUNK-1)
+            if(mappa[y][x+1] != 0)
+                this->creazione_ore_chunk(y, x+1, coeff_casualita + rand()%15, mappa, type_ore);
+
+        if(x > 0)
+            if(mappa[y][x-1] != 0)
+                this->creazione_ore_chunk(y, x-1, coeff_casualita + rand()%15, mappa, type_ore);
+
+        if(y < HEIGHT_CHUNK-1)
+            if(mappa[y+1][x] != 0)
+                this->creazione_ore_chunk(y+1, x, coeff_casualita + rand()%15, mappa, type_ore);
+
+        if(y > 0)
+            if(mappa[y-1][x] != 0)
+                this->creazione_ore_chunk(y-1, x, coeff_casualita + rand()%15, mappa, type_ore);
     }
 }
 
@@ -102,6 +128,19 @@ void Mappa::crea()
         altezza_precedente = altezza_attuale;
     }
 
+    // CREAZIONE DI UN GIACIMENTO DI COAL (CARBONE)
+    for(int i = 0; i < WIDTH_CHUNK*3; i++)
+    {
+        if(rand()%100 >= 95)
+        {
+            int altezza = 55 + rand()%20;
+            while(this->mappa[altezza][i] != STONE)
+                altezza++;
+
+            this->creazione_ore(altezza, i, 50, COAL_ORE);
+        }
+    }
+
     ofstream out("save/map_info.save");
     out << -1 << " " << 0 << " " << 1 << endl;
     out.close();
@@ -112,7 +151,21 @@ void Mappa::crea()
     for(int i = 0; i < HEIGHT_INVENTORY; i++)
     {
         for(int j = 0; j < WIDTH_INVENTORY; j++)
-            player_info << player.inventario[i][j] << " ";
+            player_info << player.inventario[i][j].blocco.id << " "
+            << player.inventario[i][j].blocco.texture << " "
+            << player.inventario[i][j].blocco.blocco << " "
+            << player.inventario[i][j].blocco.strumento << " "
+            << player.inventario[i][j].blocco.distruggi << " "
+            << player.inventario[i][j].blocco.trasparenza << " "
+            << player.inventario[i][j].blocco.secondi << " "
+            << player.inventario[i][j].blocco.da_oggetto << " "
+            << player.inventario[i][j].blocco.a_oggetto << " "
+            << player.inventario[i][j].blocco.percentuale_senza_strumento << " "
+            << player.inventario[i][j].blocco.oggetto_droppato_senza_strumento << " "
+            << player.inventario[i][j].blocco.percentuale_strumento << " "
+            << player.inventario[i][j].blocco.oggetto_droppato_strumento << " "
+            << player.inventario[i][j].blocco.durabilita << " "
+            << player.inventario[i][j].blocco.massima_stoccabilita << endl;
         player_info << endl;
     }
     player_info.close();
@@ -180,6 +233,19 @@ void Mappa::genera_chunk_sinistra(string file_name)
         }
 
         altezza_precedente = altezza_attuale;
+    }
+
+    // CREAZIONE DI UN GIACIMENTO DI COAL (CARBONE)
+    for(int i = 0; i < WIDTH_CHUNK*3; i++)
+    {
+        if(rand()%100 >= 95)
+        {
+            int altezza = 55 + rand()%20;
+            while(mappa_temp[altezza][i] != STONE)
+                altezza++;
+
+            this->creazione_ore_chunk(altezza, i, 50, mappa_temp,COAL_ORE);
+        }
     }
 
     ofstream out(file_name);
@@ -272,6 +338,19 @@ void Mappa::genera_chunk_destra(string file_name)
         }
 
         altezza_precedente = altezza_attuale;
+    }
+
+    // CREAZIONE DI UN GIACIMENTO DI COAL (CARBONE)
+    for(int i = 0; i < WIDTH_CHUNK*3; i++)
+    {
+        if(rand()%100 >= 95)
+        {
+            int altezza = 55 + rand()%20;
+            while(mappa_temp[altezza][i] != STONE)
+                altezza++;
+
+            this->creazione_ore_chunk(altezza, i, 50, mappa_temp,COAL_ORE);
+        }
     }
 
     ofstream out(file_name);
@@ -393,19 +472,19 @@ void Mappa::salva(int chunk)
 
         if(x <= 16*WIDTH_BLOCK)
         {
-            precedente.push_back({x, blocchi_droppati[i].y, blocchi_droppati[i].type});
+            precedente.push_back({x, blocchi_droppati[i].y, blocchi_droppati[i].blocco});
         }
         else if(x <= 32*WIDTH_BLOCK)
         {
             x -= 16*WIDTH_BLOCK;
 
-            attuale.push_back({x, blocchi_droppati[i].y, blocchi_droppati[i].type});
+            attuale.push_back({x, blocchi_droppati[i].y, blocchi_droppati[i].blocco});
         }
         else if(x <= 48*WIDTH_BLOCK)
         {
             x -= 32*WIDTH_BLOCK;
 
-            successivo.push_back({x, blocchi_droppati[i].y, blocchi_droppati[i].type});
+            successivo.push_back({x, blocchi_droppati[i].y, blocchi_droppati[i].blocco});
         }
 
     }
@@ -428,15 +507,60 @@ void Mappa::salva(int chunk)
 
     chunk_precedente << precedente.size() << endl;
     for(int i = 0; i < precedente.size(); i++)
-        chunk_precedente << precedente[i].x << " " << precedente[i].y << " " << precedente[i].type << endl;
+        chunk_precedente << precedente[i].x << " " << precedente[i].y << " "
+        << precedente[i].blocco.id << " "
+        << precedente[i].blocco.texture << " "
+        << precedente[i].blocco.blocco << " "
+        << precedente[i].blocco.strumento << " "
+        << precedente[i].blocco.distruggi << " "
+        << precedente[i].blocco.trasparenza << " "
+        << precedente[i].blocco.secondi << " "
+        << precedente[i].blocco.da_oggetto << " "
+        << precedente[i].blocco.a_oggetto << " "
+        << precedente[i].blocco.percentuale_senza_strumento << " "
+        << precedente[i].blocco.oggetto_droppato_senza_strumento << " "
+        << precedente[i].blocco.percentuale_strumento << " "
+        << precedente[i].blocco.oggetto_droppato_strumento << " "
+        << precedente[i].blocco.durabilita << " "
+        << precedente[i].blocco.massima_stoccabilita << endl;
 
     chunk_attuale << attuale.size() << endl;
     for(int i = 0; i < attuale.size(); i++)
-        chunk_attuale << attuale[i].x << " " << attuale[i].y << " " << attuale[i].type << endl;
+        chunk_attuale << attuale[i].x << " " << attuale[i].y << " "
+        << attuale[i].blocco.id << " "
+        << attuale[i].blocco.texture << " "
+        << attuale[i].blocco.blocco << " "
+        << attuale[i].blocco.strumento << " "
+        << attuale[i].blocco.distruggi << " "
+        << attuale[i].blocco.trasparenza << " "
+        << attuale[i].blocco.secondi << " "
+        << attuale[i].blocco.da_oggetto << " "
+        << attuale[i].blocco.a_oggetto << " "
+        << attuale[i].blocco.percentuale_senza_strumento << " "
+        << attuale[i].blocco.oggetto_droppato_senza_strumento << " "
+        << attuale[i].blocco.percentuale_strumento << " "
+        << attuale[i].blocco.oggetto_droppato_strumento << " "
+        << attuale[i].blocco.durabilita << " "
+        << attuale[i].blocco.massima_stoccabilita << endl;
 
     chunk_successivo << successivo.size() << endl;
     for(int i = 0; i < successivo.size(); i++)
-        chunk_successivo << successivo[i].x << " " << successivo[i].y << " " << successivo[i].type << endl;
+        chunk_successivo << successivo[i].x << " " << successivo[i].y << " "
+        << successivo[i].blocco.id << " "
+        << successivo[i].blocco.texture << " "
+        << successivo[i].blocco.blocco << " "
+        << successivo[i].blocco.strumento << " "
+        << successivo[i].blocco.distruggi << " "
+        << successivo[i].blocco.trasparenza << " "
+        << successivo[i].blocco.secondi << " "
+        << successivo[i].blocco.da_oggetto << " "
+        << successivo[i].blocco.a_oggetto << " "
+        << successivo[i].blocco.percentuale_senza_strumento << " "
+        << successivo[i].blocco.oggetto_droppato_senza_strumento << " "
+        << successivo[i].blocco.percentuale_strumento << " "
+        << successivo[i].blocco.oggetto_droppato_strumento << " "
+        << successivo[i].blocco.durabilita << " "
+        << successivo[i].blocco.massima_stoccabilita << endl;
 
     chunk_precedente.close();
     chunk_attuale.close();
@@ -502,11 +626,25 @@ void Mappa::preleva(int chunk)
     for(int i = 0; i < N; i++)
     {
         float x, y;
-        int type;
+        Blocco blocco;
 
-        chunk_precedente >> x >> y >> type;
-
-        blocchi_droppati.push_back({x, y, type});
+        chunk_precedente >> x >> y
+        >> blocco.id
+        >> blocco.texture
+        >> blocco.blocco
+        >> blocco.strumento
+        >> blocco.distruggi
+        >> blocco.trasparenza
+        >> blocco.secondi
+        >> blocco.da_oggetto
+        >> blocco.a_oggetto
+        >> blocco.percentuale_senza_strumento
+        >> blocco.oggetto_droppato_senza_strumento
+        >> blocco.percentuale_strumento
+        >> blocco.oggetto_droppato_strumento
+        >> blocco.durabilita
+        >> blocco.massima_stoccabilita;
+        blocchi_droppati.push_back({x, y, blocco});
     }
 
     N = 0;
@@ -514,11 +652,25 @@ void Mappa::preleva(int chunk)
     for(int i = 0; i < N; i++)
     {
         float x, y;
-        int type;
+        Blocco blocco;
 
-        chunk_attuale >> x >> y >> type;
-
-        blocchi_droppati.push_back({x + 16*40, y, type});
+        chunk_attuale>> x >> y
+        >> blocco.id
+        >> blocco.texture
+        >> blocco.blocco
+        >> blocco.strumento
+        >> blocco.distruggi
+        >> blocco.trasparenza
+        >> blocco.secondi
+        >> blocco.da_oggetto
+        >> blocco.a_oggetto
+        >> blocco.percentuale_senza_strumento
+        >> blocco.oggetto_droppato_senza_strumento
+        >> blocco.percentuale_strumento
+        >> blocco.oggetto_droppato_strumento
+        >> blocco.durabilita
+        >> blocco.massima_stoccabilita;
+        blocchi_droppati.push_back({x + 16*40, y, blocco});
     }
 
     N = 0;
@@ -526,11 +678,25 @@ void Mappa::preleva(int chunk)
     for(int i = 0; i < N; i++)
     {
         float x, y;
-        int type;
+        Blocco blocco;
 
-        chunk_successivo >> x >> y >> type;
-
-        blocchi_droppati.push_back({x + 32*WIDTH_BLOCK, y, type});
+        chunk_successivo >> x >> y
+        >> blocco.id
+        >> blocco.texture
+        >> blocco.blocco
+        >> blocco.strumento
+        >> blocco.distruggi
+        >> blocco.trasparenza
+        >> blocco.secondi
+        >> blocco.da_oggetto
+        >> blocco.a_oggetto
+        >> blocco.percentuale_senza_strumento
+        >> blocco.oggetto_droppato_senza_strumento
+        >> blocco.percentuale_strumento
+        >> blocco.oggetto_droppato_strumento
+        >> blocco.durabilita
+        >> blocco.massima_stoccabilita;
+        blocchi_droppati.push_back({x + 32*40, y, blocco});
     }
 }
 
@@ -538,41 +704,29 @@ void Mappa::disegna()
 {
     //draw_filled_rect(0,0,WIDTH_WINDOW, HEIGHT_WINDOW, Color(218,241,248, 255));
 
-    gestione_cielo();
+    gestione_ombra();
 
-    for(int i = 0; i < HEIGHT_CHUNK; i++)
+    for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
     {
-        for(int j = 0; j < WIDTH_CHUNK*3; j++)
+        for(int j =  player.inizio_finestra_x; j <  player.fine_finestra_x; j++)
         {
-            if(this->secondo_livello[i][j] != 0)
+            if(this->ombra[i][j] > 0)
             {
-                draw_image(blocchi[this->secondo_livello[i][j]].texture, j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, 255);
-                draw_filled_rect(j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(0,0,0,125));
-            }
+                if(this->secondo_livello[i][j] != 0)
+                {
+                    draw_image(blocchi[this->secondo_livello[i][j]].texture, j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, 255);
+                    draw_filled_rect(j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(0,0,0,125));
+                }
 
-            if(this->mappa[i][j] != 0)
-                draw_image(blocchi[this->mappa[i][j]].texture, j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, 255);
+                if(this->mappa[i][j] != 0)
+                    draw_image(blocchi[this->mappa[i][j]].texture, j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, 255);
+            }
         }
     }
-//    for(int i = 0; i < HEIGHT_CHUNK; i++)
-//    {
-//        for(int j = 0; j < WIDTH_CHUNK*3; j++)
-//        {
-//            if(mappa[i][j] != 0 && mappa[i][j] != 4 &&  mappa[i][j] != 5)
-//            {
-//                if(mappa[i+1][j] == 0 || mappa[i-1][j] == 0 || mappa[i][j+1] == 0 || mappa[i][j-1] == 0)
-//                    ;
-//                else if(mappa[i-2][j] == 0 || mappa[i-2][j] == 4 || mappa[i-2][j] == 5)
-//                    draw_image("image/ombra.png", j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, 255);
-//                else
-//                    draw_filled_rect(j*WIDTH_BLOCK + coeff_movimento.x, i*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(0,0,0,255));
-//            }
-//        }
-//    }
+
+    disegna_ombra();
 
 //    for(int i = 0; i < 3; i++)
 //        draw_rect(i*(WIDTH_CHUNK*40) + coeff_movimento.x, coeff_movimento.y, WIDTH_BLOCK*WIDTH_CHUNK, HEIGHT_BLOCK*HEIGHT_CHUNK, Color(255,0,0,255));
-
-    draw_filled_rect(WIDTH_WINDOW/2-5, HEIGHT_WINDOW/2-5, 10, 10, Color(0,255,0,255));
 
 }
