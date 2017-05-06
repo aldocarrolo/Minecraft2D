@@ -245,8 +245,8 @@ Blocco blocchi[MAXID] =
     {TORCH, "image/torch.png", true, false, true, true, 50, 0, MAXID, 100, TORCH, 100, TORCH, 100, 64, 9},    // TORCIA
 
     // STRUMENTI DI LAVORO
-    {WOOD_PICKAXE, "image/wood_pickaxe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 1, -1},    // PICCONE DI LEGNO
-    {STONE_PICKAXE, "image/stone_pickaxe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 1, -1},    // PICCONE DI LEGNO
+    {WOOD_PICKAXE, "image/wood_pickaxe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 60, 1, -1},    // PICCONE DI LEGNO
+    {STONE_PICKAXE, "image/stone_pickaxe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 132, 1, -1},    // PICCONE DI LEGNO
 
     {WOOD_AXE, "image/wood_axe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 1, -1},    // PICCONE DI LEGNO
     {STONE_AXE, "image/stone_axe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 1, -1},    // PICCONE DI LEGNO
