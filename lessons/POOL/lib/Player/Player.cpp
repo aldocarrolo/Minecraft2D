@@ -1,7 +1,6 @@
 #include "Inventario/Inventario.h"
 #include "Crafting_table/Crafting_table.h"
 #include "Toolbar/Toolbar.h"
-#include "Drop/Drop.h"
 
 // FUNZIONE CHE PERMETTE DI EFFETTUARE IL SALTO DEL GIOCATORE
 void salto_giocatore(p *player, Coeff_Movimento *coeff_movimento,  int mappa[][MAXWIDTH])
@@ -291,6 +290,16 @@ void creazione_blocco(int mappa[][WIDTH_CHUNK*3])
         if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.blocco == true &&
            (mappa[cursore.y_blocco-1][cursore.x_blocco] != 0 || mappa[cursore.y_blocco+1][cursore.x_blocco] != 0 || mappa[cursore.y_blocco][cursore.x_blocco-1] != 0 || mappa[cursore.y_blocco][cursore.x_blocco+1] != 0 || ::mappa.secondo_livello[cursore.y_blocco][cursore.x_blocco] != 0))
         {
+            if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id == OAK_SAPLING && (mappa[cursore.y_blocco+1][cursore.x_blocco] == GRASS || mappa[cursore.y_blocco+1][cursore.x_blocco] == DIRT))
+            {
+                Tree temp;
+                temp.x = cursore.x_blocco;
+                temp.y = cursore.y_blocco;
+                temp.tempo_passato = 0;
+
+                alberi.push_back(temp);
+            }
+
             // ALLORA SETTO IL BLOCCO CHE INDICA IL CURSORE A QUELLO DELLA TOOLBAR
             mappa[cursore.y_blocco][cursore.x_blocco] = player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id;
 
@@ -369,13 +378,8 @@ void player_cursor(Coeff_Movimento coeff_movimento)
     // DISEGNO IL RETTANGOLO NERO PER INDICARE DOVE SI TROVA IL CURSORE
     draw_rect(cursore.x_blocco*WIDTH_BLOCK + coeff_movimento.x, cursore.y_blocco*HEIGHT_BLOCK + coeff_movimento.y, WIDTH_BLOCK, HEIGHT_BLOCK, Color(50,50,50,255));
 
-    // SE LA SELEZIONE DELLA TOOLBAR E' DIVERSA DA 0
-    if(player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id != 0)
-    {
-        // ALLORA DISEGNO IL BLOCCO SELEZIONATO
-        draw_image(blocchi[player.inventario[TOOLBAR][player.selezione_toolbar].blocco.id].texture, get_mouse_x() - 5, get_mouse_y() - 5, 10, 10, 255);
-        draw_rect(get_mouse_x() - 6, get_mouse_y() - 6, 12, 12, Color(255,255,255,255));
-    }
+    draw_filled_rect(get_mouse_x() - 1, get_mouse_y() - 10, 2, 20, Color(0,0,0,255));
+    draw_filled_rect(get_mouse_x() - 10, get_mouse_y() - 1, 20, 2, Color(0,0,0,255));
 }
 
 // FUNZIONE PER LA GESTIONE DELLE VARIE FUNZIONALITA' DEL GIOCATORE
@@ -409,6 +413,9 @@ void gestione_giocatore(int mappa[][MAXWIDTH])
         // E LINVENTARIO
         if(!gestione_inventario())
         {
+            // ...E DELLA CREAZIONE/ELIMINAZIONE DEL BLOCCO
+            crea_elimina_blocchi(mappa, coeff_movimento);
+
             // AVVIO LA FUNZIONE DEL CURSORE
             player_cursor(coeff_movimento);
 
@@ -417,9 +424,6 @@ void gestione_giocatore(int mappa[][MAXWIDTH])
 
             // ...DEL SALTO DEL GIOCATORE...
             salto_giocatore(&player, &coeff_movimento, mappa);
-
-            // ...E DELLA CREAZIONE/ELIMINAZIONE DEL BLOCCO
-            crea_elimina_blocchi(mappa, coeff_movimento);
         }
     }
 }

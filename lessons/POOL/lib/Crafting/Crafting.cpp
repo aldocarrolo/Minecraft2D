@@ -169,4 +169,13 @@ void caricamento_crafting()
     crafting[int_to_string(COBBLESTONE) + int_to_string(COBBLESTONE) + "0" +
             int_to_string(COBBLESTONE) + int_to_string(STICK) + "0"+
             "0" + int_to_string(STICK) + "0"].second = 1;
+
+    // WOOD_SHOVEL
+    // nella crafting table
+    crafting["0" + int_to_string(OAK_PLANK) + "0" +
+            "0" + int_to_string(STICK) + "0"+
+            "0" + int_to_string(STICK) + "0"].first = WOOD_SHOVEL;
+    crafting["0" + int_to_string(OAK_PLANK) + "0" +
+            "0" + int_to_string(STICK) + "0"+
+            "0" + int_to_string(STICK) + "0"].second = 1;
 }

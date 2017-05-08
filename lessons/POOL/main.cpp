@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         blocchi_droppati.pop_back();
 
     init();
-    set_window(WIDTH_WINDOW,HEIGHT_WINDOW,"Prova");
+    set_window(WIDTH_WINDOW,HEIGHT_WINDOW,"Prova",1);
 
     // CARICAMENTO DEL CRAFTING IN MEMORIA
     caricamento_crafting();
@@ -71,15 +71,9 @@ int main(int argc, char* argv[])
 
         mappa.salva(mappa.chunk_attuale);
         salva_informazioni_giocatore();
-
-        stato_menu = 0;
     }
 
-    if(stato_menu != 0 && stato_menu != -1)
-    {
-        mappa.salva(mappa.chunk_attuale);
-        salva_informazioni_giocatore();
-    }
+    wait_for_button_pressed();
 
     close();
     return 0;

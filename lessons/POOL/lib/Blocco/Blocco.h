@@ -156,7 +156,7 @@ Blocco blocchi[MAXID] =
     *   massima_stoccabilita = 64
     *   luce = -1
     */
-    {LEAVE, "image/leave.png", true, false, true, false, 350, SHEARS, SHEARS, 100, 0, 100, LEAVE, 100, 64, -1},                          // FOGLIE
+    {LEAVE, "image/leave.png", true, false, true, false, 350, SHEARS, SHEARS, 5, OAK_SAPLING, 100, LEAVE, 100, 64, -1},                          // FOGLIE
 
     /**
     *   OAK_WOOD (pezzo di legno grezzo)
@@ -216,7 +216,7 @@ Blocco blocchi[MAXID] =
     *   massima_stoccabilita = 64
     *   luce = -1
     */
-    {CRAFTING_TABLE, "image/crafting_table.png", true, false, true, false, 3500, WOOD_AXE, DIAMOND_AXE, 100, CRAFTING_TABLE, 100, CRAFTING_TABLE, 100, 64, -1},             // TAVOLA DA LAVORO
+    {CRAFTING_TABLE, "image/crafting_table.png", true, false, true, false, 3750, WOOD_AXE, DIAMOND_AXE, 100, CRAFTING_TABLE, 100, CRAFTING_TABLE, 100, 64, -1},             // TAVOLA DA LAVORO
 
     /**
     *   COAL ORE (minerale di carbone)
@@ -237,7 +237,7 @@ Blocco blocchi[MAXID] =
     *   luce = -1
     */
     {COAL_ORE, "image/coal_ore.png", true, false, true, false, 15000, WOOD_PICKAXE, DIAMOND_PICKAXE, 100, AIR, 100, COAL, 100, 64, -1},
-    //{9,"image/torch.png", false, false, true, true, 50, 0, MAXID, 100, TORCH, 100, TORCH, 100, 64, 9},
+    {OAK_SAPLING, "image/oak_sapling.png", true, false, true, true, 50, 0, 0, 100, OAK_SAPLING, 100, OAK_SAPLING, 100, 64, -1},
 
     // OGGETTI
     {COAL, "image/coal.png", false, false, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 64, -1},    // CARBONE
@@ -248,6 +248,8 @@ Blocco blocchi[MAXID] =
     {WOOD_PICKAXE, "image/wood_pickaxe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 60, 1, -1},    // PICCONE DI LEGNO
     {STONE_PICKAXE, "image/stone_pickaxe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 132, 1, -1},    // PICCONE DI LEGNO
 
-    {WOOD_AXE, "image/wood_axe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 1, -1},    // PICCONE DI LEGNO
-    {STONE_AXE, "image/stone_axe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 1, -1},    // PICCONE DI LEGNO
+    {WOOD_AXE, "image/wood_axe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 60, 1, -1},    // PICCONE DI LEGNO
+    {STONE_AXE, "image/stone_axe.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 132, 1, -1},    // PICCONE DI LEGNO
+
+    {WOOD_SHOVEL, "image/wood_shovel.png", false, true, false, true, 0, 0, 0, 0, 0, 0, 0, 60, 1, -1},    // PICCONE DI LEGNO
 };

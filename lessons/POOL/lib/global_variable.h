@@ -16,32 +16,33 @@
 
 // ID BLOCCHI
 #define AIR 0
-#define GRASS 1
-#define DIRT 2
-#define STONE 3
-#define COBBLESTONE 4
-#define LEAVE 5
-#define OAK_WOOD 6
-#define OAK_PLANK 7
-#define CRAFTING_TABLE 8
-#define COAL_ORE 9
+#define GRASS AIR+1
+#define DIRT GRASS+1
+#define STONE DIRT+1
+#define COBBLESTONE STONE+1
+#define LEAVE COBBLESTONE+1
+#define OAK_WOOD LEAVE+1
+#define OAK_PLANK OAK_WOOD+1
+#define CRAFTING_TABLE OAK_PLANK+1
+#define COAL_ORE CRAFTING_TABLE+1
+#define OAK_SAPLING COAL_ORE+1
 
 // ID OGGETTI
-#define COAL 10
-#define STICK 11
-#define TORCH 12
+#define COAL OAK_SAPLING+1
+#define STICK COAL+1
+#define TORCH STICK+1
 
 // ID STRUMENTI
 // DA MODIFICARE ASSOLUTAMENTE QUANDO AGGIUNGIERO' GLI STRUMENTI NELL'ARRAY CONTENENTE I BLOCCHI
-#define WOOD_PICKAXE 13       // ID DELLA PICCONE DI LEGNO
-#define STONE_PICKAXE 14
-#define DIAMOND_PICKAXE 14       // ID DELLA PICCONE DI DIAMANTE
-#define WOOD_AXE 15
-#define STONE_AXE 16
-#define DIAMOND_AXE 16
-#define WOOD_SHOVEL 17       // ID DELLA PALA DI LEGNO
-#define DIAMOND_SHOVEL 18       // ID DELLA PALA DI DIAMANTE
-#define SHEARS 10
+#define WOOD_PICKAXE TORCH+1 // ID DELLA PICCONE DI LEGNO
+#define STONE_PICKAXE WOOD_PICKAXE+1
+#define DIAMOND_PICKAXE STONE_PICKAXE // ID DELLA PICCONE DI DIAMANTE
+#define WOOD_AXE DIAMOND_PICKAXE+1
+#define STONE_AXE WOOD_AXE+1
+#define DIAMOND_AXE STONE_AXE
+#define WOOD_SHOVEL DIAMOND_AXE+1 // ID DELLA PALA DI LEGNO
+#define DIAMOND_SHOVEL WOOD_SHOVEL+1 // ID DELLA PALA DI DIAMANTE
+#define SHEARS DIAMOND_SHOVEL+1
 
 // LIBRERIE DA INCLUDERE
 #include "Blocco/Blocco.h"
@@ -154,6 +155,13 @@ struct Blocco_Droppato  // STRUTTURA CONTENENTE LE COORDINATE E IL TIPO DI BLOCC
 };
 vector<Blocco_Droppato> blocchi_droppati;
 
+struct Tree
+{
+    int x, y;
+    int tempo_passato;
+};
+vector<Tree> alberi;
+
 struct Blocchi_Inventario   // STRUTTURA CONTENENTE LE COORDINATE DI UN BLOCCO DELL'INVENTARIO
 {
     int x, y;
@@ -165,5 +173,6 @@ struct Blocchi_Inventario   // STRUTTURA CONTENENTE LE COORDINATE DI UN BLOCCO D
 #include "Crafting/Crafting.h"
 #include "Breaking/Breaking.h"
 #include "Menu/Menu.h"
+#include "Player/Drop/Drop.h"
 #include "Mappa/Mappa.h"
 #include "Player/Player.h"

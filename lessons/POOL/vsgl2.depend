@@ -54,3 +54,112 @@
 
 1492613485 c:\users\aldo carrolo\desktop\vsgl2-master\lessons\pool\global_variable.h
 
+1494193406 source:c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\main.cpp
+	<iostream>
+	<time.h>
+	<math.h>
+	<fstream>
+	<stdlib.h>
+	<string>
+	<vector>
+	<map>
+	"../../vsgl2.h"
+	"lib/global_variable.h"
+
+1494154286 c:\users\aldo carrolo\documents\github\minecraft2d\vsgl2.h
+	<string>
+	<sstream>
+	<SDL2/SDL.h>
+	<SDL2/SDL_net.h>
+	<SDL2/SDL_image.h>
+	<SDL2/SDL_mixer.h>
+	<SDL2/SDL_ttf.h>
+	"vsgl2_keycode.h"
+
+1494154286 c:\users\aldo carrolo\documents\github\minecraft2d\vsgl2_keycode.h
+
+1494180801 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\global_variable.h
+	"Blocco/Blocco.h"
+	"util_library.h"
+	"Crafting/Crafting.h"
+	"Breaking/Breaking.h"
+	"Menu/Menu.h"
+	"Player/Drop/Drop.h"
+	"Mappa/Mappa.h"
+	"Player/Player.h"
+
+1494175819 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\blocco\blocco.h
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\util_library.h
+	"util_library.cpp"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\util_library.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\crafting\crafting.h
+	"Crafting.cpp"
+
+1494155265 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\crafting\crafting.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\breaking\breaking.h
+	"Breaking.cpp"
+
+1494155970 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\breaking\breaking.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\menu\menu.h
+	"Menu.cpp"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\menu\menu.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\mappa\mappa.h
+	"Mappa.cpp"
+
+1494196844 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\mappa\mappa.cpp
+	"Sky/Sky.h"
+	"Tree/Tree.h"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\mappa\sky\sky.h
+	"Sky.cpp"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\mappa\sky\sky.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\player.h
+	"Player.cpp"
+
+1494192796 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\player.cpp
+	"Inventario/Inventario.h"
+	"Crafting_table/Crafting_table.h"
+	"Toolbar/Toolbar.h"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\inventario\inventario.h
+	"Inventario.cpp"
+
+1494162394 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\inventario\inventario.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\crafting_table\crafting_table.h
+	"Crafting_table.cpp"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\crafting_table\crafting_table.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\toolbar\toolbar.h
+	"Toolbar.cpp"
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\toolbar\toolbar.cpp
+
+1494154282 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\drop\drop.h
+	"Drop.cpp"
+
+1494177512 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\player\drop\drop.cpp
+
+1494154286 source:c:\users\aldo carrolo\documents\github\minecraft2d\vsgl2.cpp
+	<iostream>
+	<map>
+	"version.h"
+	"vsgl2.h"
+
+1494154286 c:\users\aldo carrolo\documents\github\minecraft2d\version.h
+
+1494175356 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\mappa\tree\tree.h
+	"Tree.cpp"
+
+1494197578 c:\users\aldo carrolo\documents\github\minecraft2d\lessons\pool\lib\mappa\tree\tree.cpp
+

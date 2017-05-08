@@ -24,4 +24,8 @@ void caricamento_breaking()
 
     breaking[int_to_string(OAK_WOOD) + int_to_string(STONE_AXE)] = 2250;
     breaking[int_to_string(OAK_PLANK) + int_to_string(STONE_AXE)] = 2250;
+    breaking[int_to_string(CRAFTING_TABLE) + int_to_string(STONE_AXE)] = 1850;
+
+    breaking[int_to_string(GRASS) + int_to_string(WOOD_SHOVEL)] = 450;
+    breaking[int_to_string(DIRT) + int_to_string(WOOD_SHOVEL)] = 350;
 }

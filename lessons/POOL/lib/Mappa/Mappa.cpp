@@ -28,6 +28,7 @@ public:
 } mappa;
 
 #include "Sky/Sky.h"
+#include "Tree/Tree.h"
 
 void Mappa::creazione_ore(int y, int x, int coeff_casualita, int type_ore)
 {
@@ -151,6 +152,7 @@ void Mappa::crea()
     for(int i = 0; i < HEIGHT_INVENTORY; i++)
     {
         for(int j = 0; j < WIDTH_INVENTORY; j++)
+        {
             player_info << player.inventario[i][j].blocco.id << " "
             << player.inventario[i][j].blocco.texture << " "
             << player.inventario[i][j].blocco.blocco << " "
@@ -166,6 +168,8 @@ void Mappa::crea()
             << player.inventario[i][j].blocco.oggetto_droppato_strumento << " "
             << player.inventario[i][j].blocco.durabilita << " "
             << player.inventario[i][j].blocco.massima_stoccabilita << endl;
+        }
+
         player_info << endl;
     }
     player_info.close();
@@ -389,8 +393,6 @@ void Mappa::genera_destra()
 
 void Mappa::update()
 {
-    //cout << this->chunk_attuale << endl;
-    //cout << (int)(coeff_movimento.x + WIDTH_WINDOW/2)/40 << endl;
     if(this->chunk_attuale-1 == this->chunk_iniziale && -((coeff_movimento.x - player.x)/40.0) <= 15)
     {
         this->salva(this->chunk_attuale);
@@ -433,7 +435,70 @@ void Mappa::update()
         this->preleva(this->chunk_attuale+1);
     }
 
+    gestione_alberi();
+
     this->disegna();
+}
+
+void salva_blocchi_droppati(string file_name, vector<Blocco_Droppato> blocchi_droppati)
+{
+    ofstream out(file_name);
+
+    out << blocchi_droppati.size() << endl;
+    for(int i = 0; i < blocchi_droppati.size(); i++)
+    {
+        out << blocchi_droppati[i].x << " " << blocchi_droppati[i].y << " "
+        << blocchi_droppati[i].blocco.id << " "
+        << blocchi_droppati[i].blocco.texture << " "
+        << blocchi_droppati[i].blocco.blocco << " "
+        << blocchi_droppati[i].blocco.strumento << " "
+        << blocchi_droppati[i].blocco.distruggi << " "
+        << blocchi_droppati[i].blocco.trasparenza << " "
+        << blocchi_droppati[i].blocco.secondi << " "
+        << blocchi_droppati[i].blocco.da_oggetto << " "
+        << blocchi_droppati[i].blocco.a_oggetto << " "
+        << blocchi_droppati[i].blocco.percentuale_senza_strumento << " "
+        << blocchi_droppati[i].blocco.oggetto_droppato_senza_strumento << " "
+        << blocchi_droppati[i].blocco.percentuale_strumento << " "
+        << blocchi_droppati[i].blocco.oggetto_droppato_strumento << " "
+        << blocchi_droppati[i].blocco.durabilita << " "
+        << blocchi_droppati[i].blocco.massima_stoccabilita << endl;
+    }
+
+    out.close();
+}
+
+void preleva_blocchi_droppati(string file_name, int chunk)
+{
+    ifstream in(file_name);
+
+    int N = 0;
+    in >> N;
+    for(int i = 0; i < N; i++)
+    {
+        float x, y;
+        Blocco blocco;
+
+        in >> x >> y
+        >> blocco.id
+        >> blocco.texture
+        >> blocco.blocco
+        >> blocco.strumento
+        >> blocco.distruggi
+        >> blocco.trasparenza
+        >> blocco.secondi
+        >> blocco.da_oggetto
+        >> blocco.a_oggetto
+        >> blocco.percentuale_senza_strumento
+        >> blocco.oggetto_droppato_senza_strumento
+        >> blocco.percentuale_strumento
+        >> blocco.oggetto_droppato_strumento
+        >> blocco.durabilita
+        >> blocco.massima_stoccabilita;
+        blocchi_droppati.push_back({x + (16*chunk)*40, y, blocco});
+    }
+
+    in.close();
 }
 
 void Mappa::salva(int chunk)
@@ -489,92 +554,51 @@ void Mappa::salva(int chunk)
 
     }
 
-    ostringstream itos0;
-    itos0 << "save/drop_block/" << this->chunk_attuale-1 << ".save";
-    string temp_precedente = itos0.str();
+    string temp_precedente = "save/drop_block/" + int_to_string(this->chunk_attuale-1) + ".save";
+    string temp_attuale = "save/drop_block/" + int_to_string(this->chunk_attuale) + ".save";
+    string temp_successivo = "save/drop_block/" + int_to_string(this->chunk_attuale+1) + ".save";
 
-    ostringstream itos1;
-    itos1 << "save/drop_block/" << this->chunk_attuale << ".save";
-    string temp_attuale = itos1.str();
-
-    ostringstream itos2;
-    itos2 << "save/drop_block/" << this->chunk_attuale+1 << ".save";
-    string temp_successivo = itos2.str();
-
-    ofstream chunk_precedente(temp_precedente);
-    ofstream chunk_attuale(temp_attuale);
-    ofstream chunk_successivo(temp_successivo);
-
-    chunk_precedente << precedente.size() << endl;
-    for(int i = 0; i < precedente.size(); i++)
-        chunk_precedente << precedente[i].x << " " << precedente[i].y << " "
-        << precedente[i].blocco.id << " "
-        << precedente[i].blocco.texture << " "
-        << precedente[i].blocco.blocco << " "
-        << precedente[i].blocco.strumento << " "
-        << precedente[i].blocco.distruggi << " "
-        << precedente[i].blocco.trasparenza << " "
-        << precedente[i].blocco.secondi << " "
-        << precedente[i].blocco.da_oggetto << " "
-        << precedente[i].blocco.a_oggetto << " "
-        << precedente[i].blocco.percentuale_senza_strumento << " "
-        << precedente[i].blocco.oggetto_droppato_senza_strumento << " "
-        << precedente[i].blocco.percentuale_strumento << " "
-        << precedente[i].blocco.oggetto_droppato_strumento << " "
-        << precedente[i].blocco.durabilita << " "
-        << precedente[i].blocco.massima_stoccabilita << endl;
-
-    chunk_attuale << attuale.size() << endl;
-    for(int i = 0; i < attuale.size(); i++)
-        chunk_attuale << attuale[i].x << " " << attuale[i].y << " "
-        << attuale[i].blocco.id << " "
-        << attuale[i].blocco.texture << " "
-        << attuale[i].blocco.blocco << " "
-        << attuale[i].blocco.strumento << " "
-        << attuale[i].blocco.distruggi << " "
-        << attuale[i].blocco.trasparenza << " "
-        << attuale[i].blocco.secondi << " "
-        << attuale[i].blocco.da_oggetto << " "
-        << attuale[i].blocco.a_oggetto << " "
-        << attuale[i].blocco.percentuale_senza_strumento << " "
-        << attuale[i].blocco.oggetto_droppato_senza_strumento << " "
-        << attuale[i].blocco.percentuale_strumento << " "
-        << attuale[i].blocco.oggetto_droppato_strumento << " "
-        << attuale[i].blocco.durabilita << " "
-        << attuale[i].blocco.massima_stoccabilita << endl;
-
-    chunk_successivo << successivo.size() << endl;
-    for(int i = 0; i < successivo.size(); i++)
-        chunk_successivo << successivo[i].x << " " << successivo[i].y << " "
-        << successivo[i].blocco.id << " "
-        << successivo[i].blocco.texture << " "
-        << successivo[i].blocco.blocco << " "
-        << successivo[i].blocco.strumento << " "
-        << successivo[i].blocco.distruggi << " "
-        << successivo[i].blocco.trasparenza << " "
-        << successivo[i].blocco.secondi << " "
-        << successivo[i].blocco.da_oggetto << " "
-        << successivo[i].blocco.a_oggetto << " "
-        << successivo[i].blocco.percentuale_senza_strumento << " "
-        << successivo[i].blocco.oggetto_droppato_senza_strumento << " "
-        << successivo[i].blocco.percentuale_strumento << " "
-        << successivo[i].blocco.oggetto_droppato_strumento << " "
-        << successivo[i].blocco.durabilita << " "
-        << successivo[i].blocco.massima_stoccabilita << endl;
-
-    chunk_precedente.close();
-    chunk_attuale.close();
-    chunk_successivo.close();
+    salva_blocchi_droppati(temp_precedente, precedente);
+    salva_blocchi_droppati(temp_attuale, attuale);
+    salva_blocchi_droppati(temp_successivo, successivo);
 
     while(blocchi_droppati.size() > 0)
         blocchi_droppati.pop_back();
 
-    while(precedente.size() > 0)
-        precedente.pop_back();
-    while(attuale.size() > 0)
-        attuale.pop_back();
-    while(successivo.size() > 0)
-        successivo.pop_back();
+
+    vector<Tree> tree_precedente;
+    vector<Tree> tree_attuale;
+    vector<Tree> tree_successivo;
+
+    for(int i = 0; i < alberi.size(); i++)
+    {
+        int x = alberi[i].x;
+
+        if(x < 16)
+        {
+            tree_precedente.push_back({x, alberi[i].y, alberi[i].tempo_passato});
+        }
+        else if(x < 32)
+        {
+            tree_attuale.push_back({x, alberi[i].y, alberi[i].tempo_passato});
+        }
+        else if(x < 48)
+        {
+            tree_successivo.push_back({x, alberi[i].y, alberi[i].tempo_passato});
+        }
+
+    }
+
+    string tree_temp_precedente = "save/tree/" + int_to_string(this->chunk_attuale-1) + ".save";
+    string tree_temp_attuale = "save/tree/" + int_to_string(this->chunk_attuale) + ".save";
+    string tree_temp_successivo = "save/tree/" + int_to_string(this->chunk_attuale+1) + ".save";
+
+    salva_alberi(tree_temp_precedente, tree_precedente);
+    salva_alberi(tree_temp_attuale, tree_attuale);
+    salva_alberi(tree_temp_successivo, tree_successivo);
+
+    while(alberi.size() > 0)
+        alberi.pop_back();
 }
 
 void Mappa::preleva(int chunk)
@@ -605,105 +629,25 @@ void Mappa::preleva(int chunk)
         in.close();
     }
 
-    ostringstream itos0;
-    itos0 << "save/drop_block/" << this->chunk_attuale-1 << ".save";
-    string temp_precedente = itos0.str();
+    string temp_precedente = "save/drop_block/" + int_to_string(this->chunk_attuale-1) + ".save";
+    string temp_attuale = "save/drop_block/" + int_to_string(this->chunk_attuale) + ".save";
+    string temp_successivo = "save/drop_block/" + int_to_string(this->chunk_attuale+1) + ".save";
 
-    ostringstream itos1;
-    itos1 << "save/drop_block/" << this->chunk_attuale << ".save";
-    string temp_attuale = itos1.str();
+    preleva_blocchi_droppati(temp_precedente,0);
+    preleva_blocchi_droppati(temp_attuale,1);
+    preleva_blocchi_droppati(temp_successivo,2);
 
-    ostringstream itos2;
-    itos2 << "save/drop_block/" << this->chunk_attuale+1 << ".save";
-    string temp_successivo = itos2.str();
+    string tree_temp_precedente = "save/tree/" + int_to_string(this->chunk_attuale-1) + ".save";
+    string tree_temp_attuale = "save/tree/" + int_to_string(this->chunk_attuale) + ".save";
+    string tree_temp_successivo = "save/tree/" + int_to_string(this->chunk_attuale+1) + ".save";
 
-    ifstream chunk_precedente(temp_precedente);
-    ifstream chunk_attuale(temp_attuale);
-    ifstream chunk_successivo(temp_successivo);
-
-    int N = 0;
-    chunk_precedente >> N;
-    for(int i = 0; i < N; i++)
-    {
-        float x, y;
-        Blocco blocco;
-
-        chunk_precedente >> x >> y
-        >> blocco.id
-        >> blocco.texture
-        >> blocco.blocco
-        >> blocco.strumento
-        >> blocco.distruggi
-        >> blocco.trasparenza
-        >> blocco.secondi
-        >> blocco.da_oggetto
-        >> blocco.a_oggetto
-        >> blocco.percentuale_senza_strumento
-        >> blocco.oggetto_droppato_senza_strumento
-        >> blocco.percentuale_strumento
-        >> blocco.oggetto_droppato_strumento
-        >> blocco.durabilita
-        >> blocco.massima_stoccabilita;
-        blocchi_droppati.push_back({x, y, blocco});
-    }
-
-    N = 0;
-    chunk_attuale >> N;
-    for(int i = 0; i < N; i++)
-    {
-        float x, y;
-        Blocco blocco;
-
-        chunk_attuale>> x >> y
-        >> blocco.id
-        >> blocco.texture
-        >> blocco.blocco
-        >> blocco.strumento
-        >> blocco.distruggi
-        >> blocco.trasparenza
-        >> blocco.secondi
-        >> blocco.da_oggetto
-        >> blocco.a_oggetto
-        >> blocco.percentuale_senza_strumento
-        >> blocco.oggetto_droppato_senza_strumento
-        >> blocco.percentuale_strumento
-        >> blocco.oggetto_droppato_strumento
-        >> blocco.durabilita
-        >> blocco.massima_stoccabilita;
-        blocchi_droppati.push_back({x + 16*40, y, blocco});
-    }
-
-    N = 0;
-    chunk_successivo >> N;
-    for(int i = 0; i < N; i++)
-    {
-        float x, y;
-        Blocco blocco;
-
-        chunk_successivo >> x >> y
-        >> blocco.id
-        >> blocco.texture
-        >> blocco.blocco
-        >> blocco.strumento
-        >> blocco.distruggi
-        >> blocco.trasparenza
-        >> blocco.secondi
-        >> blocco.da_oggetto
-        >> blocco.a_oggetto
-        >> blocco.percentuale_senza_strumento
-        >> blocco.oggetto_droppato_senza_strumento
-        >> blocco.percentuale_strumento
-        >> blocco.oggetto_droppato_strumento
-        >> blocco.durabilita
-        >> blocco.massima_stoccabilita;
-        blocchi_droppati.push_back({x + 32*40, y, blocco});
-    }
+    preleva_alberi(tree_temp_precedente,0);
+    preleva_alberi(tree_temp_attuale,1);
+    preleva_alberi(tree_temp_successivo,2);
 }
 
 void Mappa::disegna()
 {
-    //draw_filled_rect(0,0,WIDTH_WINDOW, HEIGHT_WINDOW, Color(218,241,248, 255));
-
     gestione_ombra();
 
     for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
@@ -725,8 +669,4 @@ void Mappa::disegna()
     }
 
     disegna_ombra();
-
-//    for(int i = 0; i < 3; i++)
-//        draw_rect(i*(WIDTH_CHUNK*40) + coeff_movimento.x, coeff_movimento.y, WIDTH_BLOCK*WIDTH_CHUNK, HEIGHT_BLOCK*HEIGHT_CHUNK, Color(255,0,0,255));
-
 }

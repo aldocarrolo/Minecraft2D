@@ -114,9 +114,6 @@ void gravita_blocchi_droppati(int mappa[][MAXWIDTH])
         {
             if(mappa[j][((int)blocchi_droppati[i].x)/WIDTH_BLOCK] != 0)
             {
-//                draw_filled_rect((int)blocchi_droppati[i].x + coeff_movimento.x, j*40 + coeff_movimento.y, 40, 40, Color(255,0,0,255));
-//                draw_rect((int)blocchi_droppati[i].x + coeff_movimento.x, j*40 + coeff_movimento.y, 40, 40, Color(0,0,0,255));
-
                 if(!controllo_collisione(blocchi_droppati[i].x + coeff_movimento.x, blocchi_droppati[i].y + coeff_movimento.y, 10, 10, ((int)blocchi_droppati[i].x) + coeff_movimento.x, j*WIDTH_BLOCK + coeff_movimento.y - 5, WIDTH_BLOCK, HEIGHT_BLOCK))
                 {
                     blocchi_droppati[i].y += .5;
