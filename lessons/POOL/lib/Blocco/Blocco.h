@@ -116,7 +116,7 @@ Blocco blocchi[MAXID] =
     *   massima_stoccabilita = 64
     *   luce = -1
     */
-    {STONE, "image/stone.png", true, false, true, false, 7500, WOOD_PICKAXE, DIAMOND_PICKAXE, 100, 0, 100, COBBLESTONE, 100, 64, -1},             // PIETRA COTTA
+    {STONE, "image/stone.png", true, false, true, false, 75, WOOD_PICKAXE, DIAMOND_PICKAXE, 100, 0, 100, COBBLESTONE, 100, 64, -1},             // PIETRA COTTA
 
     /**
     *   COBBLESTONE (blocco di pietra grezza)
@@ -236,9 +236,70 @@ Blocco blocchi[MAXID] =
     *   massima_stoccabilita = 64
     *   luce = -1
     */
+
     {COAL_ORE, "image/coal_ore.png", true, false, true, false, 15000, WOOD_PICKAXE, DIAMOND_PICKAXE, 100, AIR, 100, COAL, 100, 64, -1},
     {OAK_SAPLING, "image/oak_sapling.png", true, false, true, true, 50, 0, 0, 100, OAK_SAPLING, 100, OAK_SAPLING, 100, 64, -1},
+    {LEAVE_WOOD, "image/oak_wood_leave.png", true, false, true, false, 350, SHEARS, SHEARS, 5, OAK_SAPLING, 100, LEAVE, 100, 64, -1},             // FOGLIE CON SOTTO LEGNO
 
+    /**
+    *   LEAVE WOOD (foglia con sotto legno)
+    *
+    *   blocco = true
+    *   strumento = false
+    *   distruggi = true
+    *   trasparenza = false
+    *   secondi = 3000ms
+    *   da_oggetto = WOOD_AXE
+    *   a_oggetto = DIAMOND_AXE
+    *   percentuale_senza_strumento = 100
+    *   oggetto_droppato_senza_strumento = OAK_WOOD
+    *   percentuale_strumento = 100
+    *   oggetto_droppato_strumento = OAK_WOOD
+    *   durabilita = 100
+    *   massima_stoccabilita = 64
+    *   luce = -1
+    */
+
+    {TALL_GRASS, "image/tall_grass.png", true, false, true, true, 50, 0, 0, 50, 0, 100, TALL_GRASS, 100, 64, -1},             // FOGLIE CON SOTTO LEGNO
+
+    /**
+    *   TALL GRASS (erbace)
+    *
+    *   blocco = true
+    *   strumento = false
+    *   distruggi = true
+    *   trasparenza = true
+    *   secondi = 3000ms
+    *   da_oggetto = WOOD_AXE
+    *   a_oggetto = DIAMOND_AXE
+    *   percentuale_senza_strumento = 100
+    *   oggetto_droppato_senza_strumento = OAK_WOOD
+    *   percentuale_strumento = 100
+    *   oggetto_droppato_strumento = OAK_WOOD
+    *   durabilita = 100
+    *   massima_stoccabilita = 64
+    *   luce = -1
+    */
+    {BEDROCK, "image/bedrock.png", true, false, false, false, 10000, 0, 0, 0, 0, 100, 0, 100, 0, -1},             // FOGLIE CON SOTTO LEGNO
+
+    /**
+    *   TALL GRASS (erbace)
+    *
+    *   blocco = true
+    *   strumento = false
+    *   distruggi = true
+    *   trasparenza = false
+    *   secondi = 3000ms
+    *   da_oggetto = WOOD_AXE
+    *   a_oggetto = DIAMOND_AXE
+    *   percentuale_senza_strumento = 100
+    *   oggetto_droppato_senza_strumento = OAK_WOOD
+    *   percentuale_strumento = 100
+    *   oggetto_droppato_strumento = OAK_WOOD
+    *   durabilita = 100
+    *   massima_stoccabilita = 64
+    *   luce = -1
+    */
     // OGGETTI
     {COAL, "image/coal.png", false, false, false, true, 0, 0, 0, 0, 0, 0, 0, 100, 64, -1},    // CARBONE
     {STICK, "image/stick.png", false, false, true, true, 0, 0, 0, 0, 0, 0, 0, 100, 64, -1},    // BASTONCINO DI LEGNO
