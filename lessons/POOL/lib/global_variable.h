@@ -2,7 +2,7 @@
 // o informazioni simili
 
 #define WIDTH_CHUNK 16      // LARGHEZZA DELLA MAPPA
-#define HEIGHT_CHUNK 100    // ALTEZZA DELLA MAPPA
+#define HEIGHT_CHUNK 110    // ALTEZZA DELLA MAPPA
 #define MAXWIDTH 48         // LARGHEZZA DELLA MAPPA
 #define MAXHEIGHT 100       // ALTEZZA DELLA MAPPA
 #define WIDTH_BLOCK 40      // LARGHEZZA BLOCCO
@@ -12,7 +12,7 @@
 #define WIDTH_INVENTORY 9   // LARGHEZZA MATRICE INVENTARIO
 #define HEIGHT_INVENTORY 4  // ALTEZZA MATRICE INVENTARIO
 #define TOOLBAR 3           // NUMERO DI RIGA DELLA TOOLBAR
-#define MAXID 20             // VALORE CHE INDICA IL VALORE MASSIMO DI OGGETTI
+#define MAXID 30             // VALORE CHE INDICA IL VALORE MASSIMO DI OGGETTI
 
 // ID BLOCCHI
 #define AIR 0
@@ -26,9 +26,12 @@
 #define CRAFTING_TABLE OAK_PLANK+1
 #define COAL_ORE CRAFTING_TABLE+1
 #define OAK_SAPLING COAL_ORE+1
+#define LEAVE_WOOD OAK_SAPLING+1
+#define TALL_GRASS LEAVE_WOOD+1
+#define BEDROCK TALL_GRASS+1
 
 // ID OGGETTI
-#define COAL OAK_SAPLING+1
+#define COAL BEDROCK+1
 #define STICK COAL+1
 #define TORCH STICK+1
 
@@ -43,7 +46,6 @@
 #define WOOD_SHOVEL DIAMOND_AXE+1 // ID DELLA PALA DI LEGNO
 #define DIAMOND_SHOVEL WOOD_SHOVEL+1 // ID DELLA PALA DI DIAMANTE
 #define SHEARS DIAMOND_SHOVEL+1
-
 // LIBRERIE DA INCLUDERE
 #include "Blocco/Blocco.h"
 
@@ -65,7 +67,7 @@ struct Inventario   // STRUTTURA CONTENENTE LE INFORMAZIONI SULL'INVENTARIO
 
 struct p    // STRUTTURA COMPLESSA CONTENENTE LE INFORMAZIONI RIGUARDANTI IL PERSONAGGIO
 {
-    float width = 30, height = 75;  // ALTEZZA E LARGHEZZA DELL'IMMAGINE DEL PERSONAGGIO
+    float width = 37.75, height = 75;  // ALTEZZA E LARGHEZZA DELL'IMMAGINE DEL PERSONAGGIO
 
     // COORDINATE SU SCHERMO DEL PERSONAGGIO
     float x = WIDTH_WINDOW/2 - width/2, y = HEIGHT_WINDOW/2 - height/2;
@@ -141,8 +143,8 @@ int albero[6][5] =
 {
     {0,         LEAVE,      LEAVE,          LEAVE,      0},
     {0,         LEAVE,      LEAVE,          LEAVE,      0},
-    {LEAVE,     LEAVE,      LEAVE,          LEAVE,      LEAVE},
-    {LEAVE,     LEAVE,      LEAVE,          LEAVE,      LEAVE},
+    {LEAVE,     LEAVE,      LEAVE_WOOD,          LEAVE,      LEAVE},
+    {LEAVE,     LEAVE,      LEAVE_WOOD,          LEAVE,      LEAVE},
     {0,         0,          OAK_WOOD,       0,          0},
     {0,         0,          OAK_WOOD,       0,          0},
 };

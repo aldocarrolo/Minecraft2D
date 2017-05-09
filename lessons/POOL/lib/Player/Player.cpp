@@ -399,12 +399,50 @@ void gestione_giocatore(int mappa[][MAXWIDTH])
 
     // DISEGNO IL GIOCATORE
     int mouse_x = get_mouse_x();
-    if(mouse_x >= 661)
-        draw_image("image/alex_destra.png", player.x, player.y, player.width, player.height);
-    else if(mouse_x <= 620)
-        draw_image("image/alex_sinistra.png", player.x, player.y, player.width, player.height);
+    if(!is_pressed(VSGL_SPACE) && is_pressed(VSGL_D))
+    {
+        if(ms_time()%1000 < 1000/8)
+            draw_image("image/movimento/alex_destra_1.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*2)
+            draw_image("image/movimento/alex_destra_2.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*3)
+            draw_image("image/movimento/alex_destra_3.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*4)
+            draw_image("image/movimento/alex_destra_4.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*5)
+            draw_image("image/movimento/alex_destra_5.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*6)
+            draw_image("image/movimento/alex_destra_6.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*7)
+            draw_image("image/movimento/alex_destra_7.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*8)
+            draw_image("image/movimento/alex_destra_8.png", player.x, player.y, player.width, player.height);
+    }
+    else if(!is_pressed(VSGL_SPACE) && is_pressed(VSGL_A))
+    {
+        if(ms_time()%1000 < 1000/8)
+            draw_image("image/movimento/alex_sinistra_1.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*2)
+            draw_image("image/movimento/alex_sinistra_2.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*3)
+            draw_image("image/movimento/alex_sinistra_3.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*4)
+            draw_image("image/movimento/alex_sinistra_4.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*5)
+            draw_image("image/movimento/alex_sinistra_5.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*6)
+            draw_image("image/movimento/alex_sinistra_6.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*7)
+            draw_image("image/movimento/alex_sinistra_7.png", player.x, player.y, player.width, player.height);
+        else if(ms_time()%1000 < 1000/8*8)
+            draw_image("image/movimento/alex_sinistra_8.png", player.x, player.y, player.width, player.height);
+    }
+    else if(is_pressed(VSGL_SPACE) && is_pressed(VSGL_A))
+        draw_image("image/movimento/alex_sinistra_2.png", player.x, player.y, player.width, player.height);
+    else if(is_pressed(VSGL_SPACE) && is_pressed(VSGL_D))
+        draw_image("image/movimento/alex_destra_2.png", player.x, player.y, player.width, player.height);
     else
-        draw_image("image/alex_frontale.png", player.x, player.y, player.width, player.height);
+        draw_image("image/movimento/alex_frontale.png", player.x, player.y, player.width, player.height);
 
 
     // SE IL GIOCATORE NON HA SELEZIONATO LA CRAFTING TABLE

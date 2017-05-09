@@ -108,10 +108,16 @@ void Mappa::crea()
             for(int k = 0; k < 6; k++)
                 for(int m = 0; m < 5; m++)
                     if(this->mappa[altezza_attuale - 6 + k][i - 2 + m] == 0)
-                        this->mappa[altezza_attuale - 6 + k][i - 2 + m] = albero[k][m];
+                            this->mappa[altezza_attuale - 6 + k][i - 2 + m] = albero[k][m];
+        }
+        if(rand()%100 >= 60 && i >= 0 && i < WIDTH_CHUNK*3)  //creazione erba superiore
+        {
+            if(this->mappa[altezza_attuale-2][i] != 4 && this->mappa[altezza_attuale-1][i] == 0 )
+                this->mappa[altezza_attuale-1][i] = TALL_GRASS;
         }
 
         this->mappa[altezza_attuale][i] = 1;
+        this->secondo_livello[altezza_attuale][i] = 1;
 
         int j;
         for(j = altezza_attuale+1; j < altezza_attuale+rand()%6+6; j++)
@@ -120,10 +126,16 @@ void Mappa::crea()
             this->secondo_livello[j][i] = 2;
         }
 
-        for(; j < HEIGHT_CHUNK; j++)
+        for(; j < HEIGHT_CHUNK-10; j++)
         {
             this->mappa[j][i] = 3;
             this->secondo_livello[j][i] = 3;
+        }
+
+        for(; j < HEIGHT_CHUNK; j++)
+        {
+            this->mappa[j][i] = BEDROCK;
+            this->secondo_livello[j][i] = BEDROCK;
         }
 
         altezza_precedente = altezza_attuale;
@@ -213,15 +225,21 @@ void Mappa::genera_chunk_sinistra(string file_name)
         else if(valore_casuale == 1 && altezza_attuale - coeff_altezza < 50)
             altezza_attuale += coeff_altezza;
 
-        if(rand()%100 >= 87 && i - 2 > 0 && i + 2 < WIDTH_CHUNK)
+        if(rand()%100 >= 87 && i - 2 >= 0 && i + 2 < WIDTH_CHUNK*3)
         {
             for(int k = 0; k < 6; k++)
                 for(int m = 0; m < 5; m++)
-                    if(mappa_temp[altezza_attuale - 6 + k][i - 2 + m] == 0)
-                        mappa_temp[altezza_attuale - 6 + k][i - 2 + m] = albero[k][m];
+                    if(this->mappa[altezza_attuale - 6 + k][i - 2 + m] == 0)
+                            mappa_temp[altezza_attuale - 6 + k][i - 2 + m] = albero[k][m];
+        }
+        if(rand()%100 >= 60 && i >= 0 && i< WIDTH_CHUNK*3)   //creazione erba superiore
+        {
+            if(mappa_temp[altezza_attuale-2][i] != 4 && mappa_temp[altezza_attuale-1][i] == 0)
+                mappa_temp[altezza_attuale-1][i] = TALL_GRASS;
         }
 
         mappa_temp[altezza_attuale][i] = 1;
+        secondo_livello_temp[altezza_attuale][i] = 1;
 
         int j;
         for(j = altezza_attuale+1; j < altezza_attuale+rand()%6+6; j++)
@@ -230,10 +248,16 @@ void Mappa::genera_chunk_sinistra(string file_name)
             secondo_livello_temp[j][i] = 2;
         }
 
-        for(; j < HEIGHT_CHUNK; j++)
+        for(; j < HEIGHT_CHUNK-10; j++)
         {
             mappa_temp[j][i] = 3;
             secondo_livello_temp[j][i] = 3;
+        }
+
+        for(; j < HEIGHT_CHUNK; j++)
+        {
+            mappa_temp[j][i] = BEDROCK;
+            secondo_livello_temp[j][i] = BEDROCK;
         }
 
         altezza_precedente = altezza_attuale;
@@ -318,15 +342,21 @@ void Mappa::genera_chunk_destra(string file_name)
         else if(valore_casuale == 1 && altezza_attuale - coeff_altezza < 50)
             altezza_attuale += coeff_altezza;
 
-        if(rand()%100 >= 87 && i - 2 >= 0 && i + 2 < WIDTH_CHUNK)
+        if(rand()%100 >= 87 && i - 2 >= 0 && i + 2 < WIDTH_CHUNK*3)
         {
             for(int k = 0; k < 6; k++)
                 for(int m = 0; m < 5; m++)
-                    if(mappa_temp[altezza_attuale - 6 + k][i - 2 + m] == 0)
-                        mappa_temp[altezza_attuale - 6 + k][i - 2 + m] = albero[k][m];
+                    if(this->mappa[altezza_attuale - 6 + k][i - 2 + m] == 0)
+                            mappa_temp[altezza_attuale - 6 + k][i - 2 + m] = albero[k][m];
+        }
+        if(rand()%100 >= 60 && i >= 0 && i< WIDTH_CHUNK*3)   //creazione erba superiore
+        {
+            if(mappa_temp[altezza_attuale-2][i] != 4 && mappa_temp[altezza_attuale-1][i] == 0)
+                mappa_temp[altezza_attuale-1][i] = TALL_GRASS;
         }
 
         mappa_temp[altezza_attuale][i] = 1;
+        secondo_livello_temp[altezza_attuale][i] = 1;
 
         int j;
         for(j = altezza_attuale+1; j < altezza_attuale+rand()%6+6; j++)
@@ -335,10 +365,16 @@ void Mappa::genera_chunk_destra(string file_name)
             secondo_livello_temp[j][i] = 2;
         }
 
-        for(; j < HEIGHT_CHUNK; j++)
+        for(; j < HEIGHT_CHUNK-10; j++)
         {
             mappa_temp[j][i] = 3;
             secondo_livello_temp[j][i] = 3;
+        }
+
+        for(; j < HEIGHT_CHUNK; j++)
+        {
+            mappa_temp[j][i] = BEDROCK;
+            secondo_livello_temp[j][i] = BEDROCK;
         }
 
         altezza_precedente = altezza_attuale;
@@ -649,7 +685,7 @@ void Mappa::preleva(int chunk)
 void Mappa::disegna()
 {
     gestione_ombra();
-
+    gestione_cielo();
     for(int i = player.inizio_finestra_y; i < player.fine_finestra_y; i++)
     {
         for(int j =  player.inizio_finestra_x; j <  player.fine_finestra_x; j++)

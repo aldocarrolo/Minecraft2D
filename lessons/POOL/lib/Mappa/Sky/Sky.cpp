@@ -1,24 +1,63 @@
+float temp_coeff_movimento_x = -20;
 void giorno()
 {
     static bool avanza = false;
 
     static float sun_x = 0;
-    static float sun_y = 300;
+    static float sun_y = 200;
     static float sun_speed = -1;
 
-    if(ms_time()%2000 < 1000 && avanza == true)
+    if(ms_time()%1000 < 250 && avanza == true)
     {
         avanza = false;
         sun_y += sun_speed;
         sun_speed += .00001;
-        sun_x += 10;
+        sun_x += 1;
     }
-    else if(ms_time()%2000 >= 1000)
+    else if(ms_time()%1000 >= 250)
     {
         avanza = true;
     }
 
-    draw_image("image/sun.png", sun_x, sun_y, 8*4, 8*4, 255);
+    if(is_pressed(VSGL_A) && player.collisione_sinistra == false)
+        temp_coeff_movimento_x += 5;
+
+    if(is_pressed(VSGL_D) && player.collisione_destra == false)
+        temp_coeff_movimento_x -= 5;
+    draw_image("image/day.png",-4*WIDTH_WINDOW+temp_coeff_movimento_x,0,4*WIDTH_WINDOW, HEIGHT_WINDOW, 255);
+    draw_image("image/day.png",0+temp_coeff_movimento_x,0,4*WIDTH_WINDOW, HEIGHT_WINDOW, 255);
+    draw_image("image/sun.png", sun_x, sun_y, 20*4, 20*4, 255);
+}
+
+void notte()
+{
+    static bool avanza = false;
+
+    static float moon_x = 0;
+    static float moon_y = 200;
+    static float moon_speed = -1;
+
+    if(ms_time()%1000 < 250 && avanza == true)
+    {
+        avanza = false;
+        moon_y += moon_speed;
+        moon_speed += .00001;
+        moon_x += 1;
+    }
+    else if(ms_time()%1000 >= 250)
+    {
+        avanza = true;
+    }
+
+    if(is_pressed(VSGL_A) && player.collisione_sinistra == false)
+        temp_coeff_movimento_x += 5;
+
+    if(is_pressed(VSGL_D) && player.collisione_destra == false)
+        temp_coeff_movimento_x -= 5;
+
+
+    draw_image("image/night.png",0+temp_coeff_movimento_x,0,4*WIDTH_WINDOW, HEIGHT_WINDOW, 255);
+    draw_image("image/moon.png", moon_x, moon_y, 20*4, 20*4, 255);
 }
 
 void disegna_ombra()
@@ -62,13 +101,13 @@ void gestione_ombra()
 
 void gestione_cielo()
 {
-/*
+
     if(ms_time()%600000 < 300000)
     {
         giorno();
     }
     else
     {
-        //draw_filled_rect(0,0,WIDTH_WINDOW, HEIGHT_WINDOW, Color(0,0,0,255));
-    }*/
+        notte();
+    }
 }
